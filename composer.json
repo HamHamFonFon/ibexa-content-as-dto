@@ -1,11 +1,19 @@
 {
   "name": "kaliop/ibexa-content-dto",
+  "licence": "MIT",
+  "version": "0.0.1",
   "description": "Transform content value object as DTO",
-  "type": "bundle",
-  "require": {},
+  "type": "symfony-bundle",
+  "authors" : [{
+    "name" : "Stéphane Méaudre",
+    "email" : "smeaudre@kaliop.com"
+  }],
+  "require": {
+    "php": "^7.3"
+  },
   "autoload": {
     "psr-4": {
-      "Kaliop\IbexaContentDto\": "src/"
+      "Kaliop\\IbexaContentDto\\": "src/"
     }
   }
 }
