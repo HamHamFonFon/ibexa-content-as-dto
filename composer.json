@@ -1,0 +1,11 @@
+{
+  "name": "kaliop/ibexa-content-dto",
+  "description": "Transform content value object as DTO",
+  "type": "bundle",
+  "require": {},
+  "autoload": {
+    "psr-4": {
+      "Kaliop\IbexaContentDto\": "src/"
+    }
+  }
+}
