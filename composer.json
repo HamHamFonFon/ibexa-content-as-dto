@@ -11,9 +11,8 @@
   }],
   "require": {
     "php": "^7.3|^8.0",
-    "symfony/process": "*"
-    //    "ezsystems/ezplatform-kernel": "^1.0",
-    //    "ezsystems/ezpublish-kernel": "^7.5"
+    "symfony/process": "*",
+    "symfony/console": "^5.4"
   },
   "require-dev": {
     "roave/security-advisories": "dev-latest"
