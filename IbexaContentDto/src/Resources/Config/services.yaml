@@ -1,0 +1,8 @@
+services:
+  _default:
+    public: false
+    autowiring: true
+    autoconfigure: true
+    bind: ~ 
+      
+    
