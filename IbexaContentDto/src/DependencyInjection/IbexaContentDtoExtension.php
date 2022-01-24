@@ -27,10 +27,10 @@ class IbexaContentDtoExtension extends Extension
      * @return void
      * @throws \Exception
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
-//        $config =
+        $config = $this->processConfiguration($configuration, $configs);
 
         $dir = $this->getDir();
         $loader = new YamlFileLoader($container, new FileLocator($dir . '/../Resources/config'));

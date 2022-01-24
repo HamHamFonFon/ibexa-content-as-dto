@@ -5,6 +5,9 @@ namespace Kaliop\IbexaContentDto\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ *
+ */
 class Configuration implements ConfigurationInterface
 {
 
@@ -18,8 +21,12 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder(self::TREE_ROOT_NODE);
         $treeBuilder->getRootNode()
             ->children()
-            ->scalarNode()
-        ->end();
+                ->scalarNode('directory_repository')->end()
+                ->scalarNode('directory_dto')->end()
+                ->scalarNode('namespace')->end()
+            ->end()
+        ->end()
+        ;
 
         return $treeBuilder;
     }

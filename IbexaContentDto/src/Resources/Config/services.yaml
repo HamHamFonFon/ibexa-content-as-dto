@@ -1,8 +1,15 @@
+parameters:
+
 services:
-  _default:
+  _defaults:
     public: false
-    autowiring: true
+    autowire: true
     autoconfigure: true
     bind: ~ 
       
-    
+  Kaliop\IbexaContentDto\Command:
+    resource: '../../Command'
+    autowire: true
+    autoconfigure: true
+    tags:
+      - { name: console.command }
