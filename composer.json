@@ -3,14 +3,17 @@
   "licence": "MIT",
   "version": "0.0.1",
   "description": "Transform content value object as DTO",
+  "keywords": ["ibexa", "content", "dto"],
   "type": "symfony-bundle",
   "authors" : [{
     "name" : "Stéphane Méaudre",
     "email" : "smeaudre@kaliop.com"
   }],
   "require": {
-    "php": "^7.3",
-    "symfony/framework-bundle": "^5.2"
+    "php": "^7.3|^8.0",
+    "symfony/process": "*"
+    //    "ezsystems/ezplatform-kernel": "^1.0",
+    //    "ezsystems/ezpublish-kernel": "^7.5"
   },
   "require-dev": {
     "roave/security-advisories": "dev-latest"
