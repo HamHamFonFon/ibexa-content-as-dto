@@ -6,7 +6,11 @@ services:
     autowire: true
     autoconfigure: true
     bind: ~ 
-      
+
+  Kaliop\IbexaContentDto\:
+    resource: '../../*'
+    exclude: '../../{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+
   Kaliop\IbexaContentDto\Command:
     resource: '../../Command'
     autowire: true
