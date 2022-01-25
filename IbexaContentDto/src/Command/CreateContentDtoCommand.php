@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kaliop\IbexaContentDto\Command;
 
+use Kaliop\IbexaContentDto\Services\Traits\IbexaServicesTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,7 +17,7 @@ class CreateContentDtoCommand extends Command
 {
     protected static $defaultName = 'kaliop:dto:create';
 
-    private $repository;
+    use IbexaServicesTrait;
 
     /**
      * @return void
@@ -32,11 +33,11 @@ class CreateContentDtoCommand extends Command
     /**
      * @param $repository
      */
-    public function __construct($repository)
-    {
-        $this->repository = $repository;
-        parent::__construct();
-    }
+//    public function __construct($repository)
+//    {
+//        $this->repository = $repository;
+//        parent::__construct();
+//    }
 
     /**
      * @param InputInterface $input
