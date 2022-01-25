@@ -11,8 +11,11 @@
   }],
   "require": {
     "php": "^7.4|^8.0",
+    "ext-json": "*",
+    "ext-intl": "*",
     "symfony/process": "*",
-    "symfony/console": "^5.4"
+    "symfony/console": "^5.4",
+    "symfony/routing": "^5.4"
   },
   "require-dev": {
     "roave/security-advisories": "dev-latest"
