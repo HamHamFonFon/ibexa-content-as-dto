@@ -2,6 +2,6 @@
 
 namespace Kaliop\IbexaContentDto\Repository;
 
-interface IbexaRepositoryInterface
+interface ContentRepositoryInterface
 {
 }

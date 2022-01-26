@@ -16,7 +16,7 @@ trait IbexaServicesTrait
     protected LocationService $locationService;
     protected ContentService $contentService;
     protected ContentTypeService $contentTypeService;
-
+    protected LanguageService $languageService;
     /**
      * @required
      * @param LocationService $locationService
@@ -41,10 +41,22 @@ trait IbexaServicesTrait
 
     /**
      * @required
-     * @param ContentTypeService $contentService
+     *
+     * @param ContentTypeService $contentTypeService
      */
     public function injectContentTypeService(ContentTypeService $contentTypeService): void
     {
         $this->contentTypeService = $this->contentTypeService ?: $contentTypeService;
+    }
+
+    /**
+     * @required
+     * @param LanguageService $languageService
+     *
+     * @return void
+     */
+    public function injectLanguageService(LanguageService $languageService)
+    {
+        $this->languageService = $this->languageService ?: $languageService;
     }
 }

@@ -7,9 +7,9 @@ namespace Kaliop\IbexaContentDto\Entity;
 /**
  *
  */
-interface IbexaContentDtoInterface
+interface ContentDtoInterface
 {
     public function getName(): ?string;
-    public function setName(string $name): ?IbexaContentDtoInterface;
+    public function setName(string $name): ?ContentDtoInterface;
     public function listObjectRelationListFields(): ?array;
 }

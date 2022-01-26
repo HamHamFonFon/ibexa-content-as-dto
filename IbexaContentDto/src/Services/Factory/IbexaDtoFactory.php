@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kaliop\IbexaContentDto\Services\Factory;
 
-use Kaliop\IbexaContentDto\Entity\IbexaContentDtoInterface;
+use Kaliop\IbexaContentDto\Entity\ContentDtoInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -24,19 +24,19 @@ final class IbexaDtoFactory
     }
 
     /**
-     * @param IbexaContentDtoInterface $dto
+     * @param ContentDtoInterface $dto
      * @param $content
      * @param $location
      * @param string $currentLanguage
      *
-     * @return IbexaContentDtoInterface
+     * @return ContentDtoInterface
      */
     public static function hydrateDto(
-        IbexaContentDtoInterface $dto,
-        $content,
-        $location,
-        string $currentLanguage
-    ): IbexaContentDtoInterface
+        ContentDtoInterface $dto,
+                            $content,
+                            $location,
+        string              $currentLanguage
+    ): ContentDtoInterface
     {
         $self = new static;
         $router = $self->router;

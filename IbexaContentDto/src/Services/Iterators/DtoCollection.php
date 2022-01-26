@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kaliop\IbexaContentDto\Services\Iterators;
 
-use Kaliop\IbexaContentDto\Entity\IbexaContentDtoInterface;
+use Kaliop\IbexaContentDto\Entity\ContentDtoInterface;
 
 /**
  *
@@ -23,11 +23,11 @@ class DtoCollection implements \IteratorAggregate
     }
 
     /**
-     * @param IbexaContentDtoInterface $dto
+     * @param ContentDtoInterface $dto
      *
      * @return void
      */
-    public function addSubDto(IbexaContentDtoInterface $dto): void
+    public function addSubDto(ContentDtoInterface $dto): void
     {
         $this->subDto[] = $dto;
     }
@@ -37,7 +37,7 @@ class DtoCollection implements \IteratorAggregate
      *
      * @return void
      */
-    public function getSubDto(int $position): ?IbexaContentDtoInterface
+    public function getSubDto(int $position): ?ContentDtoInterface
     {
         return $this->subDto[$position] ?? null;
     }
