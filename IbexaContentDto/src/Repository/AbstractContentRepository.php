@@ -9,11 +9,11 @@ use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\Exceptions\UnauthorizedException;
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
-use Kaliop\IbexaContentDto\Entity\ContentDtoInterface;
+use Kaliop\IbexaContentDto\Entity\DtoInterface;
 use Kaliop\IbexaContentDto\Services\Factory\IbexaDtoFactory;
 use Kaliop\IbexaContentDto\Services\Iterators\DtoCollection;
 use Kaliop\IbexaContentDto\Services\Traits\IbexaServicesTrait;
-use Kaliop\IbexaContentDto\Services\Traits\SymfonyServicesTraits;
+use Kaliop\IbexaContentDto\Services\Traits\SymfonyServicesTrait;
 use ReflectionClass;
 use ReflectionException;
 use ScemBundle\Repository\ezObjectsRepository\IbxRepositoryInterface;
@@ -23,7 +23,7 @@ use ScemBundle\Repository\ezObjectsRepository\IbxRepositoryInterface;
  */
 abstract class AbstractContentRepository
 {
-    use IbexaServicesTrait, SymfonyServicesTraits;
+    use IbexaServicesTrait, SymfonyServicesTrait;
 
     private SiteAccess $siteAccess;
 
@@ -75,16 +75,17 @@ abstract class AbstractContentRepository
      * @param string|null $currentLanguage
      * @param bool|null $isChild
      *
-     * @return ContentDtoInterface
+     * @return DtoInterface
      * @throws ReflectionException
      */
-    protected function buildDtoFromContent(Content $content, ?string $currentLanguage, ?bool $isChild = false): ?ContentDtoInterface
+    protected function buildDtoFromContent(Content $content, ?string $currentLanguage, ?bool $isChild = false): ?DtoInterface
     {
         if (true === $isChild) {
             $contentTypeIdentifier = $this->contentTypeService->loadContentType($content->contentInfo->contentTypeId)->identifier;
             $strDto = $this->getChildDtoClassname($contentTypeIdentifier);
         } else {
             $strDto = $this->getContentDTO();
+            $contentTypeIdentifier = $this->getContentTypeId();
         }
 
         if (is_null($strDto)) {
@@ -93,7 +94,7 @@ abstract class AbstractContentRepository
 
         $dto = new $strDto();
         $dto
-            ->setContentTypeIdentifier($this->getContentTypeId());
+            ->setContentTypeIdentifier($contentTypeIdentifier);
 
         $location = $this->locationService->loadLocation($content->contentInfo->mainLocationId);
         $currentLanguage = $currentLanguage ?? $this->languageService->getDefaultLanguageCode();
@@ -108,13 +109,13 @@ abstract class AbstractContentRepository
      * Adding nested Dto of the parent content.
      * Most time, nested dto are Dto from ezObjectRelationList
      *
-     * @param ContentDtoInterface $parentDto
+     * @param DtoInterface $parentDto
      * @param string $currentLanguage
      *
      * @return void
      * @throws ReflectionException
      */
-    private function addNestedDto(ContentDtoInterface $parentDto, string $currentLanguage): ContentDtoInterface
+    private function addNestedDto(DtoInterface $parentDto, string $currentLanguage): DtoInterface
     {
         $listFields = $parentDto->listObjectRelationListFields();
         if (empty($listFields)) {
@@ -135,7 +136,7 @@ abstract class AbstractContentRepository
                 $content = $this->contentService->loadContent($destinationContentId);
                 try {
                     $subDto = $this->buildDtoFromContent($content, $currentLanguage, true);
-                    if ($subDto instanceof ContentDtoInterface) {
+                    if ($subDto instanceof DtoInterface) {
                         $collectionDto->addSubDto($subDto);
                     }
                 } catch (ReflectionException  | NotFoundException | UnauthorizedException | Exception $e) {}

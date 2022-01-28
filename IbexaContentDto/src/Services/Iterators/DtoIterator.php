@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Kaliop\IbexaContentDto\Services\Iterators;
 
-use Kaliop\IbexaContentDto\Entity\ContentDtoInterface;
+use Kaliop\IbexaContentDto\Entity\DtoInterface;
 
 /**
  *
@@ -25,9 +25,9 @@ class DtoIterator implements \Iterator
     }
 
     /**
-     * @return ContentDtoInterface|null
+     * @return DtoInterface|null
      */
-    public function current(): ?ContentDtoInterface
+    public function current(): ?DtoInterface
     {
         return $this->dtoCollection->getSubDto($this->position);
     }

@@ -2,7 +2,7 @@
 
 namespace Kaliop\IbexaContentDto\Services\Traits;
 
-trait SymfonyServicesTraits
+trait SymfonyServicesTrait
 {
 
     protected RouterInterface $router;
