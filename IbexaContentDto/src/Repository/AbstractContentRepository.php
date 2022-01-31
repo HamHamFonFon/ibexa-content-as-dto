@@ -10,6 +10,7 @@ use eZ\Publish\API\Repository\Exceptions\UnauthorizedException;
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Kaliop\IbexaContentDto\Entity\DtoInterface;
+use Kaliop\IbexaContentDto\Repository\Query\QueryGetSubItems;
 use Kaliop\IbexaContentDto\Services\Factory\IbexaDtoFactory;
 use Kaliop\IbexaContentDto\Services\Iterators\DtoCollection;
 use Kaliop\IbexaContentDto\Services\Traits\IbexaServicesTrait;
@@ -26,6 +27,9 @@ abstract class AbstractContentRepository
     use IbexaServicesTrait, SymfonyServicesTrait;
 
     private SiteAccess $siteAccess;
+
+    public const OFFSET = 0;
+    public const LIMIT = 99999;
 
     /**
      * @param $siteAccess
@@ -181,5 +185,55 @@ abstract class AbstractContentRepository
         }
 
         return null;
+    }
+
+    /**
+     * @param Content $parentContent
+     * @param array|null $contentTypeIdentifiers
+     * @param array|null $sortClause
+     * @param array|null $sectionsIds
+     * @param int|null $offset
+     * @param int|null $limit
+     * @param array|null $excludedContentTypeIdentifiers
+     *
+     * @return DtoCollection
+     * @throws ReflectionException
+     */
+    public function buildCollectionFromParent(Content $parentContent, ?array $contentTypeIdentifiers, ?array $sortClause, ?array $sectionsIds, ?int $offset, ?int $limit, ?array $excludedContentTypeIdentifiers): DtoCollection
+    {
+        $offset = $offset ?? self::OFFSET;
+        $limit = $limit ?? self::LIMIT;
+
+        $dtoCollection = new DtoCollection();
+
+        $parentLocation = $this->locationService->loadLocation($parentContent->contentInfo->mainLocationId);
+
+        $searchService = $this->searchService;
+        $currentLanguage = $this->languageService->getDefaultLanguageCode();
+
+        $generatorListLocation = static function() use($searchService, $parentLocation, $contentTypeIdentifiers, $sortClause, $currentLanguage, $sectionsIds, $offset, $limit, $excludedContentTypeIdentifiers) {
+            $query = new QueryGetSubItems;
+            yield from $query(
+                $searchService,
+                $parentLocation,
+                $contentTypeIdentifiers,
+                $sortClause,
+                $sectionsIds,
+                $offset,
+                $limit,
+                $excludedContentTypeIdentifiers,
+                [$currentLanguage],
+                true
+            );
+        };
+
+        foreach ($generatorListLocation() as $content) {
+            $dto = $this->buildDtoFromContent($content, $currentLanguage, true);
+            if ($dto instanceof DtoInterface) {
+                $dtoCollection->addSubDto($dto);
+            }
+        }
+
+        return $dtoCollection;
     }
 }
