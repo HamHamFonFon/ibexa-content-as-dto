@@ -101,7 +101,7 @@ abstract class AbstractContentRepository
 
         $dto = IbexaDtoFactory::hydrateDto($dto, $content, $location, $currentLanguage);
 
-        return $dto->addNestedDto($dto, $currentLanguage);
+        return $this->addNestedDto($dto, $currentLanguage);
     }
 
 
