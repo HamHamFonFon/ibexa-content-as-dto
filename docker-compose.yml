@@ -1,22 +1,27 @@
-version: "3.4"
+version: "3.9"
 
 services:
   php:
+    container_name: php_cli
     build:
       context: .
-      target: symfony_php
-      args:
-        SYMFONY_VERSION: ${SYMFONY_VERSION:-}
-        SKELETON: ${SKELETON:-symfony/skeleton}
-        STABILITY: ${STABILITY:-stable}
-    restart: unless-stopped
+    env_file:
+      - .env.local
     volumes:
-      - php_socket:/var/run/php
-    healthcheck:
-      interval: 10s
-      timeout: 3s
-      retries: 3
-      start_period: 30s
+      - "./docker/php/php-fpm.d/zz-docker.conf:/usr/local/etc/php-fpm.d/www.conf"
+      - "./docker/php/conf.d/symfony.dev.ini:/usr/local/etc/php/conf.d/docker-php-ext-stack-custom.ini"
+      - .:/var/www/project:rw,cached
+    environment:
+      - SSH_AUTH_SOCK=/ssh-agent
+      - TERM=xterm-color
+    networks:
+      contentdto_net:
+        ipv4_address: 172.110.0.2
 
-volumes:
-  php_socket:
+networks:
+  contentdto_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.110.0.0/24
