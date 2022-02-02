@@ -1,8 +1,9 @@
 ARG PHP_VERSION=7.4
-FROM php:${PHP_VERSION}-cli-alpine
+FROM php:${PHP_VERSION}-fpm-alpine
 
-RUN apk add --update --no-cache \
-    php-fpm \
+RUN apk add --update && \
+    apk add --no-cache wget \
+    bash-completion \
     acl \
     curl \
     coreutils \
@@ -16,9 +17,7 @@ RUN apk add --update --no-cache \
     zip \
     pax-utils \
     sudo \
-    gnupg \
     unzip \
-    libpng-dev \
     make \
     icu-dev \
     ca-certificates
@@ -29,7 +28,6 @@ RUN docker-php-ext-install pdo pdo_mysql
 RUN docker-php-ext-install intl
 RUN docker-php-ext-install iconv
 RUN docker-php-ext-install zip
-RUN docker-php-ext-install gd
 RUN docker-php-ext-enable intl
 
 RUN docker-php-ext-configure opcache --enable-opcache \
@@ -61,6 +59,4 @@ RUN { \
 #
 #ENTRYPOINT ["docker-entrypoint"]
 
-CMD ["php"]
-
-EXPOSE 9001
+RUN rm -rf /var/cache/apk/*

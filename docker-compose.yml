@@ -11,9 +11,10 @@ services:
       - "./docker/php/php-fpm.d/zz-docker.conf:/usr/local/etc/php-fpm.d/www.conf"
       - "./docker/php/conf.d/symfony.dev.ini:/usr/local/etc/php/conf.d/docker-php-ext-stack-custom.ini"
       - .:/var/www/project:rw,cached
+    ports:
+      - "9000:9000"
     environment:
       - SSH_AUTH_SOCK=/ssh-agent
-      - TERM=xterm-color
     networks:
       contentdto_net:
         ipv4_address: 172.110.0.2
