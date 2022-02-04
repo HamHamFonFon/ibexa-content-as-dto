@@ -1,0 +1,42 @@
+<?php
+
+declare(strict_types=1);
+
+namespace #namespace#;
+
+use Kaliop\IbexaContentDto\Entity\DtoInterface;
+use Kaliop\IbexaContentDto\Entity\Dto\AbstractDto;
+
+
+class #dtoClassName# extends AbstractDto implements DtoInterface
+{
+
+    #listFields#
+
+    #getters#
+
+    public function setName(string $name): ?DtoInterface
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+
+    /**
+     * @return array|null
+     */
+    public function listObjectRelationListFields(): ?array
+    {
+        return #listObjectRelationList#;
+    }
+
+}
+

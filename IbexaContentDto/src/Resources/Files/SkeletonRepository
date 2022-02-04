@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+namespace #namespace#;
+
+use Kaliop\IbexaContentDto\Repository\AbstractContentRepository;
+use Kaliop\IbexaContentDto\Repository\ContentRepositoryInterface;
+
+use #dtoClassName#;
+
+class #dtoRepository# extends AbstractContentRepository implements ContentRepositoryInterface
+{
+    public const CONTENT_TYPE_ID = '#dto_identifier#';
+
+    public function getContentTypeId(): string
+    {
+        return self::CONTENT_TYPE_ID;
+    }
+
+    public function getContentDTO(): ?string
+    {
+        return #dtoClassName#::class;
+    }
+
+    /**
+     * Add here your methods, inject your dependencies (e.g. remoteIdHelper, custom services...)
+     */
+}
