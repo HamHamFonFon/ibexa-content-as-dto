@@ -24,6 +24,6 @@ class #dtoRepository# extends AbstractContentRepository implements ContentReposi
     }
 
     /**
-     * Add here your methods, inject your dependencies (e.g. remoteIdHelper, custom services...)
+     * Add here your custom methods, inject your dependencies (e.g. remoteIdHelper, custom services...)
      */
 }
