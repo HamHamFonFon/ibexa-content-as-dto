@@ -21,9 +21,13 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder(self::TREE_ROOT_NODE);
         $treeBuilder->getRootNode()
             ->children()
-                ->scalarNode('directory_repository')->end()
-                ->scalarNode('directory_dto')->end()
-                ->scalarNode('namespace')->end()
+                ->scalarNode('directory_repository')
+                ->end()
+                ->scalarNode('directory_dto')
+                ->end()
+                ->scalarNode('content_type_groups')
+                    ->defaultValue('Content')
+                ->end()
             ->end()
         ->end()
         ;

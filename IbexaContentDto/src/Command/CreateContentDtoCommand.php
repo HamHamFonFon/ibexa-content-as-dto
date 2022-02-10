@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Kaliop\IbexaContentDto\Command;
 
+use eZ\Publish\API\Repository\Repository;
+use eZ\Publish\API\Repository\Values\ContentType\ContentType;
+use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup;
 use Kaliop\IbexaContentDto\Services\Traits\IbexaServicesTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
  *
@@ -21,8 +26,10 @@ class CreateContentDtoCommand extends Command
     private const SKELETON_REPO = 'IbexaContentDto/src/Resources/Files/SkeletonRepository';
 
     private Repository $repository;
-    private QuestionHelper $questionHelper;
-    private string $kernelRoot;
+    private string $kernelRootDir;
+    private string $directoryRepository;
+    private string $directoryDto;
+    private array $contentTypeGroups;
 
     use IbexaServicesTrait;
 
@@ -39,13 +46,18 @@ class CreateContentDtoCommand extends Command
 
     /**
      * @param Repository $repository
-     * @param string $kernelRoot
+     * @param string $kernelRootDir
+     * @param string $directoryRepository
+     * @param string $directoryDto
+     * @param array $
      */
-    public function __construct(Repository $repository, string $kernelRoot)
+    public function __construct(Repository $repository, string $kernelRootDir, string $directoryRepository, string $directoryDto, array $contentTypeGroups)
     {
         $this->repository = $repository;
-        $this->questionHelper = $this->get('question');
-        $this->kernelRoot = $kernelRoot;
+        $this->kernelRootDir = $kernelRootDir;
+        $this->directoryRepository = $directoryRepository;
+        $this->directoryDto = $directoryDto;
+        $this->contentTypeGroups = $contentTypeGroups;
         parent::__construct();
     }
 
@@ -58,7 +70,7 @@ class CreateContentDtoCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Step 1 : list all content-type identifier
-        $contentTypeIdentifierSelected = $input->getArgument('content_type') ?? $this->getContentType();
+        $contentTypeIdentifierSelected = $input->getArgument('content_type') ?? $this->getContentType($input, $output);
         if (is_null($contentTypeIdentifierSelected)) {
             return Command::fail;
         }
@@ -82,10 +94,26 @@ class CreateContentDtoCommand extends Command
      */
     private function getContentType(InputInterface $input, OutputInterface $output): string
     {
-        $listContentTypes = $this->repository->getContentTypeService()->loadContentTypeList();
+        $authorizedContentTypesGroups = $this->contentTypeGroups ?? ['Content'];
+
+        $listContentTypesGroups = array_filter($this->repository->getContentTypeService()->loadContentTypeGroups(),
+            static function(ContentTypeGroup $contentTypeGroup) use ($authorizedContentTypesGroups) {
+                return in_array($contentTypeGroup->identifier, $authorizedContentTypesGroups, true);
+            }
+        );
+
+        $listContentTypes = array_merge(...array_map(function(ContentTypeGroup $contentTypeGroup) {
+                $listContentType = $this->repository->getContentTypeService()->loadContentTypes($contentTypeGroup);
+                return array_merge(...array_map(static function(ContentType $contentType) {
+                    return [$contentType->identifier => $contentType->getName()];
+                }, $listContentType));
+            }, $listContentTypesGroups)
+        );
+
+        $questionHelper = $this->getHelper('question');
         $question = new ChoiceQuestion('Select a content-type', $listContentTypes);
 
-        return $question->ask($input, $output, $question);
+        return $questionHelper->ask($input, $output, $question);
     }
 
     /**

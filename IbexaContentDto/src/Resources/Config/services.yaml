@@ -5,7 +5,11 @@ services:
     public: false
     autowire: true
     autoconfigure: true
-    bind: ~ 
+    bind:
+      $kernelRootDir: '%kernel.root_dir%'
+      $directoryRepository: '%ibx_content_dto.directory_repository%'
+      $directoryDto: '%ibx_content_dto.directory_dto%'
+      $contentTypeGroups: '%ibx_content_dto.content_type_groups%'
 
   Kaliop\IbexaContentDto\:
     resource: '../../*'
