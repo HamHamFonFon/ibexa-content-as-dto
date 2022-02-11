@@ -60,3 +60,8 @@ RUN { \
 #ENTRYPOINT ["docker-entrypoint"]
 
 RUN rm -rf /var/cache/apk/*
+
+COPY docker/php/bootstrap.sh /run/bootstrap.sh
+RUN chmod 755 /run/bootstrap.sh
+
+CMD ["/run/bootstrap.sh"]
