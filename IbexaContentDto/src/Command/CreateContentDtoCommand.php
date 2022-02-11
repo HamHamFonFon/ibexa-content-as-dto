@@ -128,7 +128,7 @@ class CreateContentDtoCommand extends Command
     }
 
     /**
-     * @param ContentType $contentType
+     * @param ContentT ype $contentType
      *
      * @return void
      */
