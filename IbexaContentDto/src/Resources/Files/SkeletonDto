@@ -7,7 +7,6 @@ namespace #namespace#;
 use Kaliop\IbexaContentDto\Entity\DtoInterface;
 use Kaliop\IbexaContentDto\Entity\Dto\AbstractDto;
 
-
 class #dtoClassName# extends AbstractDto implements DtoInterface
 {
 

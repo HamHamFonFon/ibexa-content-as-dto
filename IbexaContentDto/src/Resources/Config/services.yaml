@@ -15,6 +15,10 @@ services:
     resource: '../../*'
     exclude: '../../{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
 
+  Kaliop\IbexaContentDto\Services\String\NamespaceCreator:
+    autowire: true
+    autoconfigure: true
+
   Kaliop\IbexaContentDto\Command:
     resource: '../../Command'
     autowire: true

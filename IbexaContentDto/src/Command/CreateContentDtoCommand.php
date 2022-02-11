@@ -7,6 +7,8 @@ namespace Kaliop\IbexaContentDto\Command;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup;
+use Kaliop\IbexaContentDto\Services\String\CamelCaseStringify;
+use Kaliop\IbexaContentDto\Services\String\NamespaceCreator;
 use Kaliop\IbexaContentDto\Services\Traits\IbexaServicesTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,6 +28,7 @@ class CreateContentDtoCommand extends Command
     private const SKELETON_REPO = 'IbexaContentDto/src/Resources/Files/SkeletonRepository';
 
     private Repository $repository;
+    private NamespaceCreator $namespaceCreator;
     private string $kernelRootDir;
     private string $directoryRepository;
     private string $directoryDto;
@@ -49,11 +52,19 @@ class CreateContentDtoCommand extends Command
      * @param string $kernelRootDir
      * @param string $directoryRepository
      * @param string $directoryDto
-     * @param array $
+     * @param array $contentTypeGroups
      */
-    public function __construct(Repository $repository, string $kernelRootDir, string $directoryRepository, string $directoryDto, array $contentTypeGroups)
+    public function __construct(
+        Repository $repository,
+        NamespaceCreator $namespaceCreator,
+        string $kernelRootDir,
+        string $directoryRepository,
+        string $directoryDto,
+        array $contentTypeGroups
+    )
     {
         $this->repository = $repository;
+        $this->namespaceCreator = $namespaceCreator;
         $this->kernelRootDir = $kernelRootDir;
         $this->directoryRepository = $directoryRepository;
         $this->directoryDto = $directoryDto;
@@ -123,10 +134,24 @@ class CreateContentDtoCommand extends Command
      */
     private function buildDtoClass(ContentType $contentType): bool
     {
+        $camelCaseStringify = new CamelCaseStringify;
+
+        // Get class name
+        $className = $camelCaseStringify($contentType->identifier);
+
+        // Get file name and path
+        $fileName = sprintf('%s.php', $className);
+
+        $filePath = sprintf('%s/%s', $this->directoryDto, $fileName);
+        $fullFilePath = sprintf('%s/%s/%s', $this->kernelRootDir, $this->directoryDto, $fileName);
+
+        // Get namespace
+        $nameSpace = $this->namespaceCreator->buildNamespace($filePath);
+
         $mapping = [
             'namespace' => $nameSpace,
-            'dtoClassName' => $fileName,
-            'listFields' => $listFields,
+            'dtoClassName' => $className,
+            'listFields' => '',
             'getters' => '',
             'listObjectRelationList' => ''
         ];
@@ -136,11 +161,10 @@ class CreateContentDtoCommand extends Command
             if (array_key_exists($findKey, $mapping)) {
                 return $mapping[$findKey];
             }
-        }, file_get_contents(sprintf('%s/%s', $this->kernelRoot, self::SKELETON_DTO)));
+        }, file_get_contents(sprintf('%s/%s', $this->kernelRootDir, self::SKELETON_DTO)));
 
-        $fullPath = sprintf('%s/%s/%s.php', $this->kernelRoot, $nameSpace, $fileName);
-        if (!file_exists($fullPath)) {
-            $this->createFile($fullPath, utf8_decode($fileContent));
+        if (!file_exists($filePath)) {
+            $this->createFile($filePath, utf8_decode($fileContent));
         }
 
     }
