@@ -16,7 +16,7 @@ class IbexaContentDtoExtension extends Extension
 {
     public const YML_PATH = '%s/../Resources/config/%s';
 
-    protected static $filesToLoad = [
+    protected static array $filesToLoad = [
         'services.yaml'
     ];
 

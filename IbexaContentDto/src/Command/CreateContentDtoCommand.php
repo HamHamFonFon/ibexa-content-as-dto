@@ -7,14 +7,15 @@ namespace Kaliop\IbexaContentDto\Command;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup;
+use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
 use Kaliop\IbexaContentDto\Services\String\CamelCaseStringify;
 use Kaliop\IbexaContentDto\Services\String\NamespaceCreator;
 use Kaliop\IbexaContentDto\Services\Traits\IbexaServicesTrait;
+use ScemBundle\Services\Factory\DtoFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
@@ -49,6 +50,7 @@ class CreateContentDtoCommand extends Command
 
     /**
      * @param Repository $repository
+     * @param NamespaceCreator $namespaceCreator
      * @param string $kernelRootDir
      * @param string $directoryRepository
      * @param string $directoryDto
@@ -77,22 +79,35 @@ class CreateContentDtoCommand extends Command
      * @param OutputInterface $output
      *
      * @return int
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Step 1 : list all content-type identifier
         $contentTypeIdentifierSelected = $input->getArgument('content_type') ?? $this->getContentType($input, $output);
         if (is_null($contentTypeIdentifierSelected)) {
-            return Command::fail;
+            return Command::FAILURE;
         }
 
         // Step 2 : list fields of content type selected
-        $contentType = $this->repository->getContentTypeService()->loadByIdentifier($contentTypeIdentifierSelected);
+        $output->writeln('Content-type selected : ' . $contentTypeIdentifierSelected);
+        // todo : check content-type
+        $contentType = $this->repository->getContentTypeService()->loadContentTypeByIdentifier($contentTypeIdentifierSelected);
 
-        // Step 3 : build DTO class
+        // Step 3 : create DTO class
+        [$dtoNameSpace, $dtoClassName] = $buildTo = $this->buildDtoClass($contentType, $input, $output);
+        if (is_null($buildTo)) {
+            return 0;
+        }
+        $output->writeln(sprintf('DTO class "%s\%s" have been created', $dtoNameSpace, $dtoClassName));
 
-        // Step 4 : build Repository class
+        // Step 4 : Create repository class
+        [$repoNamespace, $repoClassname] = $buildRepository = $this->buildRepository($dtoNameSpace, $dtoClassName, $contentType->identifier, $input, $output);
+        if (is_null($buildRepository)) {
+            return Command::FAILURE;
+        }
 
+        $output->writeln(sprintf('Repository class "%s\%s" have been created', $repoNamespace, $repoClassname));
         return Command::SUCCESS;
     }
 
@@ -122,17 +137,20 @@ class CreateContentDtoCommand extends Command
         );
 
         $questionHelper = $this->getHelper('question');
-        $question = new ChoiceQuestion('Select a content-type', $listContentTypes);
+        $question = new ChoiceQuestion('Select a content-type :', $listContentTypes);
 
         return $questionHelper->ask($input, $output, $question);
     }
 
     /**
-     * @param ContentT ype $contentType
+     * @param ContentType $contentType
+     * @param InputInterface $input
+     * @param OutputInterface $output
      *
      * @return void
+     * @throws \Exception
      */
-    private function buildDtoClass(ContentType $contentType): bool
+    private function buildDtoClass(ContentType $contentType, InputInterface $input, OutputInterface $output): ?array
     {
         $camelCaseStringify = new CamelCaseStringify;
 
@@ -143,30 +161,151 @@ class CreateContentDtoCommand extends Command
         $fileName = sprintf('%s.php', $className);
 
         $filePath = sprintf('%s/%s', $this->directoryDto, $fileName);
-        $fullFilePath = sprintf('%s/%s/%s', $this->kernelRootDir, $this->directoryDto, $fileName);
+        $fullFilePath = sprintf('%s/../%s/%s', $this->kernelRootDir, $this->directoryDto, $fileName);
 
         // Get namespace
         $nameSpace = $this->namespaceCreator->buildNamespace($filePath);
 
+        if (class_exists($nameSpace . '\\' . $className)) {
+            $questionHelper = $this->getHelper('question');
+            $question = new ChoiceQuestion(
+                sprintf('Class "%s" already exist, do you want to continue or delete and recreate it or abort ?', $className),
+                [
+                    'continue', 'delete', 'abort'
+                ],
+                0
+            );
+
+            $response = $questionHelper->ask($input, $output, $question);
+            if (('delete' === $response) && file_exists($fullFilePath)) {
+                unlink($fullFilePath);
+            }
+
+            if ('abort' === $response) {
+                return null;
+            }
+        }
+
+        $output->writeln(sprintf('Generate "%s" classname in progress', $className));
+
+        // List fields and getters
+        $listFields = $contentType->getFieldDefinitions();
+        $listProperties = $listGetters = '';
+
+        foreach ($listFields as $field) {
+            $attribute = $camelCaseStringify($field->identifier);
+            $type = DtoFactory::getType($field->fieldTypeIdentifier);
+
+            $listProperties .= sprintf('%sprotected %s $%s;%s',"\t", $type, lcfirst($attribute), PHP_EOL);
+
+            $listGetters .= sprintf(
+                '%spublic function get%s(): %s%s%s{%s%sreturn $this->%s;%s%s}%s',
+                "\t",
+                $attribute,
+                $type,
+                PHP_EOL,
+                "\t",
+                PHP_EOL,
+                "\t\t",
+                lcfirst($attribute),
+                PHP_EOL,
+                "\t",
+                PHP_EOL . PHP_EOL
+            );
+        }
+
+        $getListRelationFields = array_filter(array_map(static function(FieldDefinition $field) {
+            return ("ezobjectrelationlist" === $field->fieldTypeIdentifier) ? sprintf('\'%s\'', $field->identifier) : null;
+        }, $listFields));
+
         $mapping = [
             'namespace' => $nameSpace,
             'dtoClassName' => $className,
-            'listFields' => '',
-            'getters' => '',
-            'listObjectRelationList' => ''
+            'listProperties' => $listProperties,
+            'getters' => $listGetters,
+            'listObjectRelationList' => (0 < count($getListRelationFields)) ? sprintf('[%s]', implode(',', $getListRelationFields)) : 'null'
         ];
 
-        $fileContent = preg_replace_callback('#%(.*?)%#', static function($match) use ($mapping) {
+        $fileContent = $this->createContent(self::SKELETON_DTO, $mapping);
+
+        if (!file_exists($fullFilePath)) {
+            $this->createFile($fullFilePath, utf8_decode($fileContent));
+        }
+
+        return [$nameSpace, $className];
+    }
+
+    /**
+     * @param string $dtoNamespace
+     * @param string $dtoClassname
+     * @param string $contentType
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     *
+     * @return array|null
+     * @throws \Exception
+     */
+    private function buildRepository(string $dtoNamespace, string $dtoClassname, string $contentType, InputInterface $input, OutputInterface $output): ?array
+    {
+        $className = sprintf('%sRepository', $dtoClassname);
+        $fileName = sprintf('%s.php', $className);
+
+        $filePath = sprintf('%s/%s', $this->directoryRepository, $fileName);
+        $fullFilePath = sprintf('%s/../%s/%s', $this->kernelRootDir, $this->directoryRepository, $fileName);
+
+        $nameSpace = $this->namespaceCreator->buildNamespace($filePath);
+
+        if (class_exists($nameSpace . '\\' . $className)) {
+            $questionHelper = $this->getHelper('question');
+            $question = new ChoiceQuestion(
+                sprintf('Class "%s" already exist, do you want to continue or delete and recreate it or abort ?', $className),
+                [
+                    'continue', 'delete', 'abort'
+                ],
+                0
+            );
+
+            $response = $questionHelper->ask($input, $output, $question);
+            if (('delete' === $response) && file_exists($fullFilePath)) {
+                unlink($fullFilePath);
+            }
+
+            if ('abort' === $response) {
+                return null;
+            }
+        }
+
+        $mapping = [
+            'namespace' => $nameSpace,
+            'dtoNamespaceClassName' => sprintf('%s\%s', $dtoNamespace, $dtoClassname),
+            'dtoRepository' => $className,
+            'dtoIdentifier' => $contentType,
+            'dtoClassName' => $dtoClassname
+        ];
+
+        $fileContent = $this->createContent(self::SKELETON_REPO, $mapping);
+
+        if (!file_exists($fullFilePath)) {
+            $this->createFile($fullFilePath, utf8_decode($fileContent));
+        }
+
+        return [$nameSpace, $className];
+    }
+
+    /**
+     * @param string $skeletonFile
+     * @param array $mapping
+     *
+     * @return array|string|string[]|null
+     */
+    private function createContent(string $skeletonFile, array $mapping)
+    {
+        return preg_replace_callback('#%(.*?)%#', static function($match) use ($mapping) {
             $findKey = $match[1];
             if (array_key_exists($findKey, $mapping)) {
                 return $mapping[$findKey];
             }
-        }, file_get_contents(sprintf('%s/%s', $this->kernelRootDir, self::SKELETON_DTO)));
-
-        if (!file_exists($filePath)) {
-            $this->createFile($filePath, utf8_decode($fileContent));
-        }
-
+        }, file_get_contents(sprintf('%s/../%s', $this->kernelRootDir, $skeletonFile)));
     }
 
     /**

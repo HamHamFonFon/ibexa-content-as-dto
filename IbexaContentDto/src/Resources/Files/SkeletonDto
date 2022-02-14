@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace #namespace#;
+namespace %namespace%;
 
 use Kaliop\IbexaContentDto\Entity\DtoInterface;
 use Kaliop\IbexaContentDto\Entity\Dto\AbstractDto;
 
-class #dtoClassName# extends AbstractDto implements DtoInterface
+class %dtoClassName% extends AbstractDto implements DtoInterface
 {
 
-    #listFields#
+%listProperties%
 
-    #getters#
+%getters%
 
     public function setName(string $name): ?DtoInterface
     {
@@ -34,8 +34,6 @@ class #dtoClassName# extends AbstractDto implements DtoInterface
      */
     public function listObjectRelationListFields(): ?array
     {
-        return #listObjectRelationList#;
+        return %listObjectRelationList%;
     }
-
 }
-

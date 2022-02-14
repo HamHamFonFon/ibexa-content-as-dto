@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace #namespace#;
+namespace %namespace%;
 
 use Kaliop\IbexaContentDto\Repository\AbstractContentRepository;
 use Kaliop\IbexaContentDto\Repository\ContentRepositoryInterface;
 
-use #dtoClassName#;
+use %dtoNamespaceClassName%;
 
-class #dtoRepository# extends AbstractContentRepository implements ContentRepositoryInterface
+class %dtoRepository% extends AbstractContentRepository implements ContentRepositoryInterface
 {
-    public const CONTENT_TYPE_ID = '#dto_identifier#';
+    public const CONTENT_TYPE_ID = '%dtoIdentifier%';
 
     public function getContentTypeId(): string
     {
@@ -20,7 +20,7 @@ class #dtoRepository# extends AbstractContentRepository implements ContentReposi
 
     public function getContentDTO(): ?string
     {
-        return #dtoClassName#::class;
+        return %dtoClassName%::class;
     }
 
     /**

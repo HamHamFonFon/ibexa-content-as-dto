@@ -48,20 +48,21 @@ final class NamespaceCreator
         $namespace = null;
 
         // Read composer JSON
-        $reader = new ComposerReader(sprintf('%s/composer.json', $this->getKernelRootDir()));
+        $reader = new ComposerReader(sprintf('%s/../composer.json', $this->getKernelRootDir()));
         if (!$reader->canRead()) {
             throw new \RuntimeException("composer.json file is not readable");
         }
 
         // get type of autoload (psr-0 or psr-4)
-        $section = new AutoloadSection($reader, AutoloadSection::TYPE_PSR0);
-        if (0 === $section->count()) {
-            $section = new AutoloadSection($reader, AutoloadSection::TYPE_PSR4);
-        }
+        //        $section = new AutoloadSection($reader, AutoloadSection::TYPE_PSR0);
+        //        if (0 === $section->count()) {
+        $section = new AutoloadSection($reader, AutoloadSection::TYPE_PSR4);
+        //        }
 
         while ($section->valid()) {
             $currentSection = $section->current();
-            if (true === str_contains($currentSection->source, $fullPath)) {
+
+            if (true === str_contains($fullPath, $currentSection->source)) {
                 $sourceNamespace = $currentSection->source;
                 $prefixNamespace = $currentSection->namespace;
                 break;
@@ -69,6 +70,10 @@ final class NamespaceCreator
             $section->next();
         }
 
-        return $prefixNamespace . str_replace(DIRECTORY_SEPARATOR, '\\', substr($fullPath, strlen($sourceNamespace)));
+        return $prefixNamespace . str_replace(
+                DIRECTORY_SEPARATOR,
+                '\\',
+                substr(dirname($fullPath), strlen($sourceNamespace))
+            );
     }
 }
