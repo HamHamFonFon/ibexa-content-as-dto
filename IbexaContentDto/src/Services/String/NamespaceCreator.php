@@ -45,8 +45,6 @@ final class NamespaceCreator
      */
     public function buildNamespace(string $fullPath): ?string
     {
-        $namespace = null;
-
         // Read composer JSON
         $reader = new ComposerReader(sprintf('%s/../composer.json', $this->getKernelRootDir()));
         if (!$reader->canRead()) {
