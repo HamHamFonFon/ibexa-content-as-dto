@@ -8,6 +8,7 @@ use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup;
 use eZ\Publish\API\Repository\Values\ContentType\FieldDefinition;
+use Kaliop\IbexaContentDto\Services\Factory\IbexaDtoFactory;
 use Kaliop\IbexaContentDto\Services\String\CamelCaseStringify;
 use Kaliop\IbexaContentDto\Services\String\NamespaceCreator;
 use Kaliop\IbexaContentDto\Services\Traits\IbexaServicesTrait;
@@ -94,20 +95,32 @@ class CreateContentDtoCommand extends Command
         // todo : check content-type
         $contentType = $this->repository->getContentTypeService()->loadContentTypeByIdentifier($contentTypeIdentifierSelected);
 
+        $question = $this->getHelper('question');
+
         // Step 3 : create DTO class
-        [$dtoNameSpace, $dtoClassName] = $buildTo = $this->buildDtoClass($contentType, $input, $output);
-        if (is_null($buildTo)) {
-            return 0;
-        }
-        $output->writeln(sprintf('DTO class "%s\%s" have been created', $dtoNameSpace, $dtoClassName));
+//        $questionDto = new ChoiceQuestion('Do you want generate DTO class ?', ['no', 'yes']);
+//        $isBuildDto = $question->ask($input, $output, $questionDto);
+//        if (1 === $isBuildDto) {
+            [$dtoNameSpace, $dtoClassName] = $buildTo = $this->buildDtoClass($contentType, $input, $output);
+            if (is_null($buildTo)) {
+                return 0;
+            }
+            $output->writeln(sprintf('DTO class "%s\%s" have been created', $dtoNameSpace, $dtoClassName));
+//        }
+
 
         // Step 4 : Create repository class
-        [$repoNamespace, $repoClassname] = $buildRepository = $this->buildRepository($dtoNameSpace, $dtoClassName, $contentType->identifier, $input, $output);
-        if (is_null($buildRepository)) {
-            return Command::FAILURE;
-        }
+//        $questionRepo = new ChoiceQuestion('Do you want generate Repository class ?', ['no', 'yes']);
+//        $isBuildRepo = $question->ask($input, $output, $questionRepo);
+//        if (1 === $isBuildRepo) {
+            [$repoNamespace, $repoClassname] = $buildRepository = $this->buildRepository($dtoNameSpace, $dtoClassName, $contentType->identifier, $input, $output);
+            if (is_null($buildRepository)) {
+                return Command::FAILURE;
+            }
 
-        $output->writeln(sprintf('Repository class "%s\%s" have been created', $repoNamespace, $repoClassname));
+            $output->writeln(sprintf('Repository class "%s\%s" have been created', $repoNamespace, $repoClassname));
+//        }
+
         return Command::SUCCESS;
     }
 
@@ -194,12 +207,12 @@ class CreateContentDtoCommand extends Command
 
         foreach ($listFields as $field) {
             $attribute = $camelCaseStringify($field->identifier);
-            $type = DtoFactory::getType($field->fieldTypeIdentifier);
+            $type = IbexaDtoFactory::getType($field->fieldTypeIdentifier);
 
             $listProperties .= sprintf('%sprotected %s $%s;%s',"\t", $type, lcfirst($attribute), PHP_EOL);
 
             $listGetters .= sprintf(
-                '%spublic function get%s(): %s%s%s{%s%sreturn $this->%s;%s%s}%s',
+                '%spublic function get%s(): ?%s%s%s{%s%sreturn $this->%s;%s%s}%s',
                 "\t",
                 $attribute,
                 $type,

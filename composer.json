@@ -26,5 +26,10 @@
     "psr-4": {
       "Kaliop\\IbexaContentDto\\": "IbexaContentDto/src/"
     }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "0.0.x"
+    }
   }
 }

@@ -15,7 +15,7 @@ abstract class AbstractDto
 
     private Content $content;
     private Location $location;
-    private string $url;
+    private string $ibexaUrl;
     private string $contentTypeIdentifier;
     private string $contentRemoteId;
     private string $locationRemoteId;
@@ -61,19 +61,19 @@ abstract class AbstractDto
     /**
      * @return string
      */
-    public function getUrl(): string
+    public function getIbexaUrl(): string
     {
-        return $this->url;
+        return $this->ibexaUrl;
     }
 
     /**
-     * @param string $url
+     * @param string $ibexaUrl
      *
      * @return AbstractDto
      */
-    public function setUrl(string $url): AbstractDto
+    public function setIbexaUrl(string $ibexaUrl): AbstractDto
     {
-        $this->url = $url;
+        $this->ibexaUrl = $ibexaUrl;
         return $this;
     }
 
