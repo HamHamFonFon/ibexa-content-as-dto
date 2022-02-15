@@ -9,6 +9,7 @@ use eZ\Publish\API\Repository\Values\Content\Field;
 use Kaliop\IbexaContentDto\Entity\DtoInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use eZ\Publish\Core\MVC\Symfony\Routing\Generator\RouteReferenceGeneratorInterface;
 
 /**
  *
@@ -16,6 +17,7 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 final class IbexaDtoFactory
 {
     private RouterInterface $router;
+    private RouteReferenceGeneratorInterface $ezRouter;
 
     /**
      *
@@ -24,6 +26,7 @@ final class IbexaDtoFactory
     {
         global $kernel;
         $this->router = $kernel->getContainer()->get('router');
+        $this->ezRouter = $kernel->getContainer()->get('ezpublish.route_reference.generator');
     }
 
     /**
@@ -126,6 +129,8 @@ final class IbexaDtoFactory
             case 'ezimage':
                 $value = (!is_null($field->value->id)) ? $field->value : null;
                 break;
+            case 'ezbinaryfile':
+                //$value = $this->router->generate('ez_content_download')$field->value;
             case 'ezurl':
             default:
                 return $field->value;

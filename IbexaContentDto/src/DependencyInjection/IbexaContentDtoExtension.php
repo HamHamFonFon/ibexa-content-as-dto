@@ -3,7 +3,6 @@
 namespace Kaliop\IbexaContentDto\DependencyInjection;
 
 use ReflectionClass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;

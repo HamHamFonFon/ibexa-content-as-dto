@@ -19,7 +19,9 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::TREE_ROOT_NODE);
-        $treeBuilder->getRootNode()
+        $rootNode = $treeBuilder->getRootNode();
+
+        $rootNode
             ->children()
                 ->scalarNode('dir_repository')
                 ->end()
@@ -29,7 +31,6 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue('Content')
                 ->end()
             ->end()
-        ->end()
         ;
 
         return $treeBuilder;

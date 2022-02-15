@@ -12,7 +12,6 @@ use Kaliop\IbexaContentDto\Services\Factory\IbexaDtoFactory;
 use Kaliop\IbexaContentDto\Services\String\CamelCaseStringify;
 use Kaliop\IbexaContentDto\Services\String\NamespaceCreator;
 use Kaliop\IbexaContentDto\Services\Traits\IbexaServicesTrait;
-use ScemBundle\Services\Factory\DtoFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

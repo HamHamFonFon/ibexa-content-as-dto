@@ -12,7 +12,6 @@ use eZ\Publish\API\Repository\Values\Content\Location;
  */
 abstract class AbstractDto
 {
-
     private Content $content;
     private Location $location;
     private string $ibexaUrl;
