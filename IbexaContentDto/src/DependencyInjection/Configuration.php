@@ -23,13 +23,9 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('dir_repository')
-                ->end()
-                ->scalarNode('dir_dto')
-                ->end()
-                ->scalarNode('content_type_groups')
-                    ->defaultValue('Content')
-                ->end()
+                ->scalarNode('dir_repository')->isRequired()->end()
+                ->scalarNode('dir_dto')->isRequired()->end()
+                ->arrayNode('content_type_groups')->prototype('scalar')->treatNullLike(array())->end()
             ->end()
         ;
 

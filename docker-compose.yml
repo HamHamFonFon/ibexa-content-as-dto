@@ -11,6 +11,7 @@ services:
       - "./docker/php/php-fpm.d/zz-docker.conf:/usr/local/etc/php-fpm.d/www.conf"
       - "./docker/php/conf.d/symfony.dev.ini:/usr/local/etc/php/conf.d/docker-php-ext-stack-custom.ini"
       - .:/var/www/project:rw,cached
+    working_dir: /var/www/project
     ports:
       - "9000:9000"
     environment:
