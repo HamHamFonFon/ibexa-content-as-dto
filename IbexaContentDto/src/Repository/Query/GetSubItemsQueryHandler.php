@@ -12,7 +12,7 @@ use eZ\Publish\API\Repository\Values\Content\Query\Criterion\LogicalNot;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion\ParentLocationId;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion\Visibility;
 
-final class QueryGetSubItems
+final class GetSubItemsQueryHandler
 {
     /**
      * @param Location $parentLocation

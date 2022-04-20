@@ -77,7 +77,14 @@ final class IbexaDtoFactory
         $normalizer = new CamelCaseToSnakeCaseNameConverter();
         $reflector = new \ReflectionClass($dto);
 
-        foreach ($content->getFieldsByLanguage($currentLanguage) as $field) {
+        // if mode than one translation, we force current language
+        if(count($content->versionInfo->languageCodes) > 1) {
+            $listFields = $content->getFieldsByLanguage($currentLanguage);
+        } else {
+            $listFields = $content->getFieldsByLanguage();
+        }
+
+        foreach ($listFields as $field) {
             $dtoPropertyName = $normalizer->denormalize($field->fieldDefIdentifier);
             if ($reflector->hasProperty($dtoPropertyName)) {
                 $property = $reflector->getProperty($dtoPropertyName);
@@ -112,8 +119,8 @@ final class IbexaDtoFactory
                 $fieldSettings = $content->getContentType()
                     ->getFieldDefinition($field->fieldDefIdentifier)
                     ->getFieldSettings();
-                $selection = $field->value->selection[0];
-                $value = $fieldSettings['options'][$selection];
+                $selection = (0 < count($field->value->selection)) ? $field->value->selection[0] : null;
+                $value = (!is_null($selection)) ? $fieldSettings['options'][$selection] : null;
                 break;
             case 'ezobjectrelationlist':
                 $value = $field->value->destinationContentIds;

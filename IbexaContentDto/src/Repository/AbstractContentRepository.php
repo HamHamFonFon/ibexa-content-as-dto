@@ -10,14 +10,15 @@ use eZ\Publish\API\Repository\Exceptions\UnauthorizedException;
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Location;
 use Kaliop\IbexaContentDto\Entity\DtoInterface;
-use Kaliop\IbexaContentDto\Repository\Query\QueryGetSubItems;
+use Kaliop\IbexaContentDto\Repository\Query\GetSubItemsQueryHandler;
 use Kaliop\IbexaContentDto\Services\Factory\IbexaDtoFactory;
 use Kaliop\IbexaContentDto\Services\Iterators\DtoCollection;
 use Kaliop\IbexaContentDto\Services\Traits\IbexaServicesTrait;
 use Kaliop\IbexaContentDto\Services\Traits\SymfonyServicesTrait;
 use ReflectionClass;
 use ReflectionException;
-use ScemBundle\Repository\ezObjectsRepository\IbxRepositoryInterface;
+
+
 
 /**
  *
@@ -27,14 +28,15 @@ abstract class AbstractContentRepository
     use IbexaServicesTrait, SymfonyServicesTrait;
 
     private SiteAccess $siteAccess;
+    protected array $listRepositories;
 
     public const OFFSET = 0;
     public const LIMIT = 99999;
 
     /**
-     * @param $siteAccess
+     * @param SiteAccess $siteAccess
      */
-    public function __construct($siteAccess)
+    public function __construct(SiteAccess $siteAccess)
     {
         $this->siteAccess = $siteAccess;
     }
@@ -75,15 +77,38 @@ abstract class AbstractContentRepository
     }
 
     /**
+     * @param string $repository
+     *
+     * @return void
+     */
+    public function addListRepository(string $repository): void
+    {
+        $this->listRepositories[] = $repository;
+    }
+
+    public function getRepositories(): ?array
+    {
+        return $this->listRepositories;
+    }
+
+    /**
      * @param Content $content
      * @param string|null $currentLanguage
      * @param bool|null $isChild
      *
      * @return DtoInterface
      * @throws ReflectionException
+     * @throws \ErrorException
      */
     protected function buildDtoFromContent(Content $content, ?string $currentLanguage, ?bool $isChild = false): ?DtoInterface
     {
+        set_error_handler(static function($severity, $errstr, $errfile, $errline) {
+            if (0 === error_reporting()) {
+                return false;
+            }
+            throw new \ErrorException($errstr, 0, $severity, $errfile, $errline);
+        });
+
         if (true === $isChild) {
             $contentTypeIdentifier = $this->contentTypeService->loadContentType($content->contentInfo->contentTypeId)->identifier;
             $strDto = $this->getChildDtoClassname($contentTypeIdentifier);
@@ -103,9 +128,12 @@ abstract class AbstractContentRepository
         $location = $this->locationService->loadLocation($content->contentInfo->mainLocationId);
         $currentLanguage = $currentLanguage ?? $this->languageService->getDefaultLanguageCode();
 
-        $dto = IbexaDtoFactory::hydrateDto($dto, $content, $location, $currentLanguage);
+        try {
+            $dto = IbexaDtoFactory::hydrateDto($dto, $content, $location, $currentLanguage);
+            $dto = $this->addNestedDto($dto, $currentLanguage);
+        } catch (Exception $e) {}
 
-        return $this->addNestedDto($dto, $currentLanguage);
+        return $dto;
     }
 
 
@@ -136,14 +164,21 @@ abstract class AbstractContentRepository
             $property->setAccessible(true);
 
             $collectionDto = new DtoCollection();
-            foreach ($property->getValue($parentDto) as $destinationContentId) {
+            $values = $property->getValue($parentDto);
+            if (empty($values)) {
+                continue;
+            }
+            foreach ($values as $destinationContentId) {
                 $content = $this->contentService->loadContent($destinationContentId);
+                if (!$content instanceof Content) {
+                    continue;
+                }
                 try {
-                    $subDto = $this->buildDtoFromContent($content, $currentLanguage, true);
-                    if ($subDto instanceof DtoInterface) {
-                        $collectionDto->addSubDto($subDto);
+                    $nestedDto = $this->buildDtoFromContent($content, $currentLanguage, true);
+                    if ($nestedDto instanceof DtoInterface) {
+                        $collectionDto->addSubDto($nestedDto);
                     }
-                } catch (ReflectionException  | NotFoundException | UnauthorizedException | Exception $e) {}
+                } catch (ReflectionException | NotFoundException | UnauthorizedException | Exception $e) {}
             }
 
             $property->setValue($parentDto, $collectionDto);
@@ -160,14 +195,7 @@ abstract class AbstractContentRepository
      */
     private function getChildDtoClassname(string $contentTypeId): ?string
     {
-        /**
-         * List of class who extends AbstractIbxRepository
-         */
-        $repoChildrenClass = array_filter(get_declared_classes(), static function($class) {
-            return is_subclass_of($class, self::class);
-        });
-
-        foreach ($repoChildrenClass as $childrenClass) {
+        foreach ($this->getRepositories() as $childrenClass) {
             $childReflector = new ReflectionClass($childrenClass);
             if ($childReflector->implementsInterface(ContentRepositoryInterface::class)) {
                 /**
@@ -197,7 +225,7 @@ abstract class AbstractContentRepository
      * @param array|null $excludedContentTypeIdentifiers
      *
      * @return DtoCollection
-     * @throws ReflectionException
+     * @throws ReflectionException|\ErrorException
      */
     public function buildCollectionFromParent(Content $parentContent, ?array $contentTypeIdentifiers, ?array $sortClause, ?array $sectionsIds, ?int $offset, ?int $limit, ?array $excludedContentTypeIdentifiers): DtoCollection
     {
@@ -212,7 +240,7 @@ abstract class AbstractContentRepository
         $currentLanguage = $this->languageService->getDefaultLanguageCode();
 
         $generatorListLocation = static function() use($searchService, $parentLocation, $contentTypeIdentifiers, $sortClause, $currentLanguage, $sectionsIds, $offset, $limit, $excludedContentTypeIdentifiers) {
-            $query = new QueryGetSubItems;
+            $query = new GetSubItemsQueryHandler;
             yield from $query(
                 $searchService,
                 $parentLocation,

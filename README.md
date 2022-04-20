@@ -8,7 +8,7 @@ of the Composer documentation.
 Requirements
 ----------------------------------------
  - PHP 7.4 or more
- - Ibexa 3.
+ - Ibexa 3.x
 
 Installation
 ----------------------------------------
@@ -34,7 +34,7 @@ $ composer require kaliop/ibexa-content-dto
 
 For ezplatform 2.5 project, execute :
 ```console
-$ compsoer require kaliop/ibexa-content-dto:dev-ezp
+$ composer require kaliop/ibexa-content-dto:dev-ezp
 ```
 
 ### Step 2: Enable the Bundle
