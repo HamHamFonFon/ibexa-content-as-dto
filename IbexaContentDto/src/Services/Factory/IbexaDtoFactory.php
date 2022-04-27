@@ -126,8 +126,7 @@ final class IbexaDtoFactory
                 $value = $field->value->destinationContentIds;
                 break;
             case 'ezdate':
-                // @todo check value
-                $value = $field->value->datetime;
+                $value = $field->value->date;
                 break;
             case 'eztime':
                 // @todo check value
