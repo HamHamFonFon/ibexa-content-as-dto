@@ -10,7 +10,7 @@
     "email" : "smeaudre@kaliop.com"
   }],
   "require": {
-    "php": "^7.4|^8.0",
+    "php": "^8.0",
     "ext-json": "*",
     "ext-intl": "*",
     "nadar/php-composer-reader": "^1.3",

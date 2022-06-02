@@ -152,36 +152,15 @@ final class IbexaDtoFactory
      */
     public static function getType(string $fieldTypeIdentifier): string
     {
-        switch ($fieldTypeIdentifier) {
-            case 'ezstring':
-            case 'ezselection':
-            case 'eztext':
-                $type = 'string';
-                break;
-            case 'ezinteger':
-                $type = 'int';
-                break;
-            case 'ezboolean':
-                $type = 'bool';
-                break;
-            case 'ezrichtext':
-                $type = '\DOMDocument';
-                break;
-            case 'ezobjectrelationlist':
-                $type = 'array';
-                break;
-            case 'eztime':
-            case 'ezdate':
-                $type = '\DateTimeInterface';
-                break;
-            case 'ezimage':
-                $type = '?ValueObject';
-                break;
-            case 'ezurl':
-            default:
-                $type = '';
-        }
-
-        return $type;
+        return match ($fieldTypeIdentifier) {
+            'ezstring', 'ezselection', 'eztext' => 'string',
+            'ezinteger' => 'int',
+            'ezboolean' => 'bool',
+            'eztime', 'ezdate' => '\DateTimeInterface',
+            'ezobjectrelationlist' => 'array',
+            'ezrichtext' => '\DOMDocument',
+            'ezimage' => '?ValueObject',
+            default => ''
+        };
     }
 }
