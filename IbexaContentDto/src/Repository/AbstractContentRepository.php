@@ -17,7 +17,7 @@ use Kaliop\IbexaContentDto\Services\Traits\IbexaServicesTrait;
 use Kaliop\IbexaContentDto\Services\Traits\SymfonyServicesTrait;
 use ReflectionClass;
 use ReflectionException;
-
+use Kaliop\IbexaContentDto\Repository\ContentRepositoryInterface;
 
 
 /**
@@ -69,7 +69,7 @@ abstract class AbstractContentRepository
     }
 
     /**
-     * @return mixed|string|null
+     * @return string
      */
     protected function getSiteAccessName(): string
     {
@@ -96,7 +96,7 @@ abstract class AbstractContentRepository
      * @param string|null $currentLanguage
      * @param bool|null $isChild
      *
-     * @return DtoInterface
+     * @return DtoInterface|null
      * @throws ReflectionException
      * @throws \ErrorException
      */
@@ -144,7 +144,7 @@ abstract class AbstractContentRepository
      * @param DtoInterface $parentDto
      * @param string $currentLanguage
      *
-     * @return void
+     * @return DtoInterface
      * @throws ReflectionException
      */
     private function addNestedDto(DtoInterface $parentDto, string $currentLanguage): DtoInterface
@@ -209,6 +209,9 @@ abstract class AbstractContentRepository
                     $reflectionMethod = $childReflector->getMethod('getContentDTO');
                     return $reflectionMethod->invoke(new $childrenClass($this->siteAccess));
                 }
+            } else {
+                $msg = sprintf('"%s" doesn\'t seem to implement interface "%s", please add it.', $childrenClass, ContentRepositoryInterface::class);
+                throw new \RuntimeException($msg);
             }
         }
 

@@ -7,18 +7,16 @@ of the Composer documentation.
 
 Introduction
 ----------------------------------------
-This bundle give the possibility to visualize yourq contents data as a DTO (data transform object).
+This bundle give the possibility to visualize your contents data as a DTO (data transform object).
 A DTO (Data Transform Object) is a simple object with properties and getters/setters who store data.
 Ibexa Content object are complex and have a lot of informations. A content object transformed into a DTO will be easier to read and use
 because it will contains only fields value (in current language for multiple languages).
 
 
-
-
 Requirements
 ----------------------------------------
- - PHP 8.0 or more
- - Ibexa 3.x
+ - PHP 8.0 or later
+ - Ibexa DXP or Experience 3.0 or later.
 
 Installation
 ----------------------------------------
@@ -58,6 +56,11 @@ return [
 
 ### Step 3 : Configure the Bundle
 Configure `directory_repository` , `directory_dto` and `content_type_groups` values :
+
+- directory_repository: path where repositories will be created (e.g.: src/Repository/)
+- directory_dto: path where DTO will be created (e.g.: src/Entity/DTO/)
+- content_type_groups: list of content-groups ("Content" by default)
+
 ```yaml
 # config/packages/ibx_content_dto.yaml
 ibx_content_dto:
@@ -79,6 +82,7 @@ There is two ways to create a couple DTO/repository
 #### Manually:
 Create your DTO class, add properties (camelcase-style). Properties name must be same as fields identifier but in camel-case style.
 Your DTO needs to extends `AbstractDto` class and implements `DtoInterface` interface. Add getters/setters and mandatory methods.
+
 Example, you have a content-type `article` with fields `title` (ezstring), `title_long` (ezstring), `image_header` (ezimage), `text` (ezrichtext), `related_articles` (ezobjectrelationlist) 
 Your DTO will be like this :
 ```php 
@@ -90,7 +94,7 @@ class Article extends AbstractDto implements DtoInterface
 {
     protected ?string $title;
     protected ?string $titleLong;
-    prtected $image;
+    protected $image;
     protected ?DOMDocument $text;
     protected ListDto $relatedArticles;
 
@@ -117,3 +121,15 @@ Just use symfony command `php bin/console kaliop:dto:create`, both classes will 
 Future evolution
 ----------------------------------------
  - Create or update content from a DTO
+
+Contributes
+----------------------------------------
+I accepts contributions, please fork the project and submit pull requests.
+
+Bugs and issues
+----------------------------------------
+In case you find some bugs or have question about this repository, open an issue and I will answer you as soon as possible.
+
+Authors
+----------------------------------------
+Stéphane MEAUDRE <smeaudre@kaliop.com>
