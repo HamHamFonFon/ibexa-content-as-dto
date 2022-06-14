@@ -227,7 +227,7 @@ class CreateContentDtoCommand extends Command
         }
 
         $getListRelationFields = array_filter(array_map(static function(FieldDefinition $field) use($camelCaseStringify) {
-            return ("ezobjectrelationlist" === $field->fieldTypeIdentifier) ? sprintf('\'%s\'', $camelCaseStringify($field->identifier)) : null;
+            return ("ezobjectrelationlist" === $field->fieldTypeIdentifier) ? sprintf('\'%s\'', lcfirst($camelCaseStringify($field->identifier))) : null;
         }, $listFields));
 
         $mapping = [
