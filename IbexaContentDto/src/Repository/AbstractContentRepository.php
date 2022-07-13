@@ -150,7 +150,7 @@ abstract class AbstractContentRepository
     private function addNestedDto(DtoInterface $parentDto, string $currentLanguage): DtoInterface
     {
         $listFields = $parentDto->listObjectRelationListFields();
-        if (empty($listFields)) {
+        if (is_null($listFields)) {
             return $parentDto;
         }
 
@@ -169,16 +169,20 @@ abstract class AbstractContentRepository
                 continue;
             }
             foreach ($values as $destinationContentId) {
-                $content = $this->contentService->loadContent($destinationContentId);
-                if (!$content instanceof Content) {
-                    continue;
-                }
                 try {
-                    $nestedDto = $this->buildDtoFromContent($content, $currentLanguage, true);
-                    if ($nestedDto instanceof DtoInterface) {
-                        $collectionDto->addSubDto($nestedDto);
+                    $content = $this->contentService->loadContent($destinationContentId);
+                    if (!$content instanceof Content) {
+                        continue;
                     }
+                    $nestedDto = $this->buildDtoFromContent($content, $currentLanguage, true);
                 } catch (ReflectionException | NotFoundException | UnauthorizedException | Exception $e) {}
+
+                if ($nestedDto instanceof DtoInterface) {
+                    $collectionDto->addSubDto($nestedDto);
+                } else {
+                    throw new \RuntimeException('Error add nested DTO');
+                }
+
             }
 
             $property->setValue($parentDto, $collectionDto);
