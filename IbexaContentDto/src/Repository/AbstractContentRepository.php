@@ -125,11 +125,11 @@ abstract class AbstractContentRepository
         $dto
             ->setContentTypeIdentifier($contentTypeIdentifier);
 
-        $location = $this->locationService->loadLocation($content->contentInfo->mainLocationId);
+        $mainLocation = $this->locationService->loadLocation($content->contentInfo->mainLocationId);
         $currentLanguage = $currentLanguage ?? $this->languageService->getDefaultLanguageCode();
 
         try {
-            $dto = IbexaDtoFactory::hydrateDto($dto, $content, $location, $currentLanguage);
+            $dto = IbexaDtoFactory::hydrateDto($dto, $content, $mainLocation, $currentLanguage);
             $dto = $this->addNestedDto($dto, $currentLanguage);
         } catch (Exception $e) {}
 

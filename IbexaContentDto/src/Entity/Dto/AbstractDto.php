@@ -13,8 +13,8 @@ use eZ\Publish\API\Repository\Values\Content\Location;
 abstract class AbstractDto
 {
     private Content $content;
-    private Location $location;
-    private string $ibexaUrl;
+    private Location $mainLocation;
+    private string $mainIbexaUrl;
     private string $contentTypeIdentifier;
     private string $contentRemoteId;
     private string $locationRemoteId;
@@ -41,40 +41,39 @@ abstract class AbstractDto
     /**
      * @return Location
      */
-    public function getLocation(): Location
+    public function getMainLocation(): Location
     {
-        return $this->location;
+        return $this->mainLocation;
     }
 
     /**
-     * @param Location $location
-     *
+     * @param Location $mainLocation
      * @return AbstractDto
      */
-    public function setLocation(Location $location): AbstractDto
+    public function setMainLocation(Location $mainLocation): AbstractDto
     {
-        $this->location = $location;
+        $this->mainLocation = $mainLocation;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getIbexaUrl(): string
+    public function getMainIbexaUrl(): string
     {
-        return $this->ibexaUrl;
+        return $this->mainIbexaUrl;
     }
 
     /**
-     * @param string $ibexaUrl
-     *
+     * @param string $mainIbexaUrl
      * @return AbstractDto
      */
-    public function setIbexaUrl(string $ibexaUrl): AbstractDto
+    public function setMainIbexaUrl(string $mainIbexaUrl): AbstractDto
     {
-        $this->ibexaUrl = $ibexaUrl;
+        $this->mainIbexaUrl = $mainIbexaUrl;
         return $this;
     }
+
 
     /**
      * @return string

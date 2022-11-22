@@ -49,8 +49,8 @@ final class IbexaDtoFactory
 
         $dto
             ->setContent($content)
-            ->setLocationId($content->contentInfo->mainLocationId)
-            ->setIbexaUrl($router->generate('ez_urlalias', ['locationId' => $content->contentInfo->mainLocationId]))
+            ->setMainLocationId($content->contentInfo->mainLocationId)
+            ->setMainIbexaUrl($router->generate('ez_urlalias', ['locationId' => $content->contentInfo->mainLocationId]))
         ;
 
         /** @todo : check multi positionnement */
