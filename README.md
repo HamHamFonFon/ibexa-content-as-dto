@@ -9,14 +9,14 @@ Introduction
 ----------------------------------------
 This bundle give the possibility to visualize your contents data as a DTO (data transform object).
 A DTO (Data Transform Object) is a simple object with properties and getters/setters who store data.
-Ibexa Content object are complex and have a lot of informations. A content object transformed into a DTO will be easier to read and use
-because it will contains only fields value (in current language for multiple languages).
+Ibexa Content object are complex and have a lot of information. A content object transformed into a DTO will be easier to read and use
+because it will contain only fields value (in current language for multiple languages).
 
 
 Requirements
 ----------------------------------------
  - PHP 8.0 or later
- - Ibexa DXP or Experience 3.0 or later.
+ - Ibexa 4.0 (Ibexa DXP) / Symfony 5.*
 
 Installation
 ----------------------------------------
@@ -43,7 +43,7 @@ $ composer require kaliop/ibexa-content-dto
 ### Step 2: Enable the Bundle
 
 Then, enable the bundle by adding it to the list of registered bundles
-in the `config/bundles.php` file of your project (for Ibexa 3.x):
+in the `config/bundles.php` file of your project:
 
 ```php
 // config/bundles.php
@@ -73,7 +73,7 @@ ibx_content_dto:
 
 Basic usages
 ----------------------------------------
-DTO works in couple with a repository linked to it. DTO contains only fields values and repository retrieve data from your back-office helped with ibexa repositories service.
+DTO works in couple with a repository linked to it. DTO contains only fields values and repository retrieve data from your back-office helped with Ibexa repositories service.
 
 ### Step 1: Create a couple DTO/Repository
 
@@ -81,7 +81,7 @@ There is two ways to create a couple DTO/repository
 
 #### Manually:
 Create your DTO class, add properties (camelcase-style). Properties name must be same as fields identifier but in camel-case style.
-Your DTO needs to extends `AbstractDto` class and implements `DtoInterface` interface. Add getters/setters and mandatory methods.
+Your DTO needs to extend `AbstractDto` class and implements `DtoInterface` interface. Add getters/setters and mandatory methods.
 
 Example, you have a content-type `article` with fields `title` (ezstring), `title_long` (ezstring), `image_header` (ezimage), `text` (ezrichtext), `related_articles` (ezobjectrelationlist) 
 Your DTO will be like this :
@@ -124,7 +124,7 @@ Future evolution
 
 Contributes
 ----------------------------------------
-I accepts contributions, please fork the project and submit pull requests.
+I accept contributions, please fork the project and submit pull requests.
 
 Bugs and issues
 ----------------------------------------
