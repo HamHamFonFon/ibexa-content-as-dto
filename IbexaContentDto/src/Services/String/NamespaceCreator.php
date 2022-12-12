@@ -40,8 +40,7 @@ final class NamespaceCreator
     /**
      * @param string $fullPath
      *
-     * @return void
-     * @throws Exception
+     * @return string|null
      */
     public function buildNamespace(string $fullPath): ?string
     {
@@ -57,6 +56,8 @@ final class NamespaceCreator
         $section = new AutoloadSection($reader, AutoloadSection::TYPE_PSR4);
         //        }
 
+        $sourceNamespace = '';
+        $prefixNamespace = '';
         while ($section->valid()) {
             $currentSection = $section->current();
 
@@ -69,9 +70,9 @@ final class NamespaceCreator
         }
 
         return $prefixNamespace . str_replace(
-                DIRECTORY_SEPARATOR,
-                '\\',
-                substr(dirname($fullPath), strlen($sourceNamespace))
-            );
+            DIRECTORY_SEPARATOR,
+            '\\',
+            substr(dirname($fullPath), strlen($sourceNamespace))
+        );
     }
 }

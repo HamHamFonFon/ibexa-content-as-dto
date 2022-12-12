@@ -15,7 +15,7 @@ use eZ\Publish\API\Repository\Values\Content\Query\Criterion\Visibility;
 final class GetSubItemsQueryHandler
 {
     /**
-     * @param Location $parentLocation
+     * @param string $parentLocationId
      * @param array $contentTypeIdentifiers
      * @param array|null $sortClauses
      * @param array|null $sectionIds
@@ -28,8 +28,7 @@ final class GetSubItemsQueryHandler
      * @return \Generator
      */
     public function __invoke(
-        SearchService $searchService,
-        Location $parentLocation,
+        string $parentLocationId,
         array $contentTypeIdentifiers,
         ?array $sortClauses,
         ?array $sectionIds,
@@ -43,7 +42,7 @@ final class GetSubItemsQueryHandler
         $ibexaSortClause = new SortClause;
 
         $criterions = [];
-        $criterions[] = new ParentLocationId($parentLocation->id);
+        $criterions[] = new ParentLocationId($parentLocationId);
 
         if ($visibility) {
             $criterions[] = new Visibility(Visibility::VISIBLE);
@@ -71,12 +70,14 @@ final class GetSubItemsQueryHandler
         $query->offset = $offset;
         $query->sortClauses = $sortClauses ?? $ibexaSortClause($parentLocation);
 
-        $searchResult = $searchService->findLocations($query);
+        return $query;
+
+       /* $searchResult = $searchService->findLocations($query);
 
         foreach ($searchResult->searchHits as $searchHit) {
             $result = $searchHit->valueObject;
             yield $result->getContent();
-        }
+        }*/
     }
 
 }

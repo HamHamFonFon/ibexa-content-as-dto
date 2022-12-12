@@ -242,24 +242,28 @@ abstract class AbstractContentRepository
         $dtoCollection = new DtoCollection();
 
         $parentLocation = $this->locationService->loadLocation($parentContent->contentInfo->mainLocationId);
-
-        $searchService = $this->searchService;
         $currentLanguage = $this->languageService->getDefaultLanguageCode();
 
-        $generatorListLocation = static function() use($searchService, $parentLocation, $contentTypeIdentifiers, $sortClause, $currentLanguage, $sectionsIds, $offset, $limit, $excludedContentTypeIdentifiers) {
+        $generatorListLocation = function() use($parentLocation, $contentTypeIdentifiers, $sortClause, $currentLanguage, $sectionsIds, $offset, $limit, $excludedContentTypeIdentifiers) {
             $query = new GetSubItemsQueryHandler;
-            yield from $query(
-                $searchService,
-                $parentLocation,
-                $contentTypeIdentifiers,
-                $sortClause,
-                $sectionsIds,
-                $offset,
-                $limit,
-                $excludedContentTypeIdentifiers,
-                [$currentLanguage],
-                true
+            $searchResult = $this->searchService->findLocations(
+                $query(
+                    $parentLocation->id,
+                    $contentTypeIdentifiers,
+                    $sortClause,
+                    $sectionsIds,
+                    $offset,
+                    $limit,
+                    $excludedContentTypeIdentifiers,
+                    [$currentLanguage],
+                    true
+                )
             );
+
+            foreach ($searchResult->searchHits as $searchHit) {
+                $result = $searchHit->valueObject;
+                yield $result->getContent();
+            }
         };
 
         foreach ($generatorListLocation() as $content) {
