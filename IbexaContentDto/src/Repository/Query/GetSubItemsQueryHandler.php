@@ -68,16 +68,11 @@ final class GetSubItemsQueryHandler
         $query->filter = new LogicalAnd($criterions);
         $query->limit = $limit;
         $query->offset = $offset;
-        $query->sortClauses = $sortClauses ?? $ibexaSortClause($parentLocation);
+        $query->sortClauses = $sortClauses ?? $ibexaSortClause(
+            $parentLocationId
+        );
 
         return $query;
-
-       /* $searchResult = $searchService->findLocations($query);
-
-        foreach ($searchResult->searchHits as $searchHit) {
-            $result = $searchHit->valueObject;
-            yield $result->getContent();
-        }*/
     }
 
 }
