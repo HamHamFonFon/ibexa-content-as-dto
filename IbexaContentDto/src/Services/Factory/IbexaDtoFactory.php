@@ -9,25 +9,12 @@ use eZ\Publish\API\Repository\Values\Content\Field;
 use Kaliop\IbexaContentDto\Entity\DtoInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
-use eZ\Publish\Core\MVC\Symfony\Routing\Generator\RouteReferenceGeneratorInterface;
 
 /**
- *
+ * Convert Content into DTO
  */
 final class IbexaDtoFactory
 {
-    private RouterInterface $router;
-    private RouteReferenceGeneratorInterface $ezRouter;
-
-    /**
-     *
-     */
-    public function __construct()
-    {
-        global $kernel;
-        $this->router = $kernel->getContainer()->get('router');
-        $this->ezRouter = $kernel->getContainer()->get('ezpublish.route_reference.generator');
-    }
 
     /**
      * @param DtoInterface $dto
@@ -40,40 +27,9 @@ final class IbexaDtoFactory
     public static function hydrateDto(
         DtoInterface $dto,
                      $content,
-                     $location,
         string       $currentLanguage
     ): DtoInterface
     {
-        $self = new static;
-        $router = $self->router;
-
-        $dto
-            ->setContent($content)
-            ->setMainLocationId($content->contentInfo->mainLocationId)
-            ->setMainIbexaUrl($router->generate('ez_urlalias', ['locationId' => $content->contentInfo->mainLocationId]))
-        ;
-
-        /** @todo : check multi positionnement */
-        $name = $content->getName($currentLanguage);
-        if (empty($name)) {
-            $dto->setName('No translated name');
-        } else {
-            $dto->setName($name);
-        }
-
-
-        if (!is_null($location) && !empty($location->remoteId)) {
-            $dto->setLocationRemoteId($location->remoteId);
-        }
-
-        if (!empty($content->contentInfo->remoteId)) {
-            $dto->setContentRemoteId($content->contentInfo->remoteId);
-        }
-
-//        if (is_null($dto->isRestricted())) {
-//            $dto->setIsRestricted(false);
-//        }
-
         $normalizer = new CamelCaseToSnakeCaseNameConverter();
         $reflector = new \ReflectionClass($dto);
 
@@ -99,7 +55,7 @@ final class IbexaDtoFactory
     /**
      * @return mixed
      */
-    private static function getValue(Content $content, Field $field)
+    private static function getValue(Content $content, Field $field): mixed
     {
         switch ($field->fieldTypeIdentifier) {
             case 'ezstring':
@@ -163,4 +119,6 @@ final class IbexaDtoFactory
             default => ''
         };
     }
+
+
 }

@@ -12,6 +12,7 @@ use eZ\Publish\API\Repository\Values\Content\Location;
 use Kaliop\IbexaContentDto\Entity\DtoInterface;
 use Kaliop\IbexaContentDto\Repository\Query\GetSubItemsQueryHandler;
 use Kaliop\IbexaContentDto\Services\Factory\IbexaDtoFactory;
+use Kaliop\IbexaContentDto\Services\Factory\IbexaProperties;
 use Kaliop\IbexaContentDto\Services\Iterators\DtoCollection;
 use Kaliop\IbexaContentDto\Services\Traits\IbexaServicesTrait;
 use Kaliop\IbexaContentDto\Services\Traits\SymfonyServicesTrait;
@@ -28,6 +29,9 @@ abstract class AbstractContentRepository
     use IbexaServicesTrait, SymfonyServicesTrait;
 
     private SiteAccess $siteAccess;
+
+    private IbexaProperties $ibexaProperties;
+
     protected array $listRepositories;
 
     public const OFFSET = 0;
@@ -35,10 +39,12 @@ abstract class AbstractContentRepository
 
     /**
      * @param SiteAccess $siteAccess
+     * @param IbexaProperties $ibexaProperties
      */
-    public function __construct(SiteAccess $siteAccess)
+    public function __construct(SiteAccess $siteAccess, IbexaProperties $ibexaProperties)
     {
         $this->siteAccess = $siteAccess;
+        $this->ibexaProperties = $ibexaProperties;
     }
 
     abstract public function getContentTypeId(): string;
@@ -92,6 +98,24 @@ abstract class AbstractContentRepository
     }
 
     /**
+     * @param Location $location
+     * @param string|null $currentLanguage
+     * @param bool|null $isChild
+     * @return DtoInterface|null
+     * @throws ReflectionException
+     * @throws \ErrorException
+     */
+    protected function buildDtoFromLocation(Location $location, ?string $currentLanguage, ?bool $isChild = false): ?DtoInterface
+    {
+        $dto = $this->buildDtoFromContent($location->getContent(), $currentLanguage, $isChild);
+        if (!is_null($dto)) {
+            $dto = $this->ibexaProperties->attachLocation($location);
+        }
+
+        return $dto;
+    }
+
+    /**
      * @param Content $content
      * @param string|null $currentLanguage
      * @param bool|null $isChild
@@ -123,13 +147,16 @@ abstract class AbstractContentRepository
 
         $dto = new $strDto();
         $dto
-            ->setContentTypeIdentifier($contentTypeIdentifier);
+            ->setContentTypeIdentifier($contentTypeIdentifier)
+        ;
 
         $mainLocation = $this->locationService->loadLocation($content->contentInfo->mainLocationId);
         $currentLanguage = $currentLanguage ?? $this->languageService->getDefaultLanguageCode();
 
         try {
-            $dto = IbexaDtoFactory::hydrateDto($dto, $content, $mainLocation, $currentLanguage);
+            $dto = (IbexaDtoFactory::hydrateDto($dto, $content, $currentLanguage));
+            $dto = $this->ibexaProperties->attachContent($content);
+            $dto = $this->ibexaProperties->attachLocation($mainLocation);
             $dto = $this->addNestedDto($dto, $currentLanguage);
         } catch (Exception $e) {}
 
