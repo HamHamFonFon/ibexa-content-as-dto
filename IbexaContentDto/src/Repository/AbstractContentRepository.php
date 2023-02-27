@@ -19,7 +19,6 @@ use Kaliop\IbexaContentDto\Services\Traits\IbexaServicesTrait;
 use Kaliop\IbexaContentDto\Services\Traits\SymfonyServicesTrait;
 use ReflectionClass;
 use ReflectionException;
-use Kaliop\IbexaContentDto\Repository\ContentRepositoryInterface;
 use RuntimeException;
 
 
