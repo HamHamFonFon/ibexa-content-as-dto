@@ -1,6 +1,11 @@
 parameters:
 
 services:
+  _instanceof:
+    Kaliop\IbexaContentDto\Repository\ContentRepositoryInterface:
+      tags: ['content_dto_repository']
+    Kaliop\IbexaContentDto\Entity\DtoInterface:
+      tags: ['content_dto']
   _defaults:
     public: false
     autowire: true
