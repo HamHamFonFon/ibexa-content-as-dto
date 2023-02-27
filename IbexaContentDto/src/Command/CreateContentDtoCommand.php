@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kaliop\IbexaContentDto\Command;
 
+use Exception;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\ContentType\ContentType;
 use eZ\Publish\API\Repository\Values\ContentType\ContentTypeGroup;
@@ -66,7 +67,7 @@ class CreateContentDtoCommand extends Command
      * @param OutputInterface $output
      *
      * @return int
-     * @throws \Exception
+     * @throws Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -146,8 +147,7 @@ class CreateContentDtoCommand extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      *
-     * @return void
-     * @throws \Exception
+     * @return array|null
      */
     private function buildDtoClass(ContentType $contentType, InputInterface $input, OutputInterface $output): ?array
     {
@@ -242,7 +242,7 @@ class CreateContentDtoCommand extends Command
      * @param OutputInterface $output
      *
      * @return array|null
-     * @throws \Exception
+     * @throws Exception
      */
     private function buildRepository(string $dtoNamespace, string $dtoClassname, string $contentType, InputInterface $input, OutputInterface $output): ?array
     {
@@ -297,7 +297,7 @@ class CreateContentDtoCommand extends Command
      *
      * @return array|string|string[]|null
      */
-    private function createContent(string $skeletonFile, array $mapping)
+    private function createContent(string $skeletonFile, array $mapping): array|string|null
     {
         return preg_replace_callback('#%(.*?)%#', static function($match) use ($mapping) {
             $findKey = $match[1];

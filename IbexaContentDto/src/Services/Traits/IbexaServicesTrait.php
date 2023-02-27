@@ -9,8 +9,6 @@ use eZ\Publish\API\Repository\LocationService;
 use eZ\Publish\API\Repository\ContentTypeService;
 use eZ\Publish\API\Repository\SearchService;
 use eZ\Publish\API\Repository\LanguageService;
-
-
 /**
  *
  */
@@ -22,55 +20,31 @@ trait IbexaServicesTrait
     protected LanguageService $languageService;
     protected SearchService $searchService;
 
-    /**
-     * @required
-     * @param LocationService $locationService
-     *
-     * @return void
-     */
+    #[Required]
     public function injectLocationService(LocationService $locationService): void
     {
         $this->locationService = $this->locationService ?: $locationService;
     }
 
-
-    /**
-     * @required
-     * @param ContentService $contentService
-     */
+    #[Required]
     public function injectContentService(ContentService $contentService): void
     {
         $this->contentService = $this->contentService ?: $contentService;
     }
 
-
-    /**
-     * @required
-     *
-     * @param ContentTypeService $contentTypeService
-     */
+    #[Required]
     public function injectContentTypeService(ContentTypeService $contentTypeService): void
     {
         $this->contentTypeService = $this->contentTypeService ?: $contentTypeService;
     }
 
-    /**
-     * @required
-     * @param LanguageService $languageService
-     *
-     * @return void
-     */
+    #[Required]
     public function injectLanguageService(LanguageService $languageService): void
     {
         $this->languageService = $this->languageService ?: $languageService;
     }
 
-    /**
-     * @required
-     * @param SearchService $searchService
-     *
-     * @return void
-     */
+    #[Required]
     public function injectSearchService(SearchService $searchService): void
     {
         $this->searhService = $this->searchService ?: $searchService;

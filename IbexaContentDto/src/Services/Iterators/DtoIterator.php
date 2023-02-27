@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Kaliop\IbexaContentDto\Services\Iterators;
 
+use Iterator;
 use Kaliop\IbexaContentDto\Entity\DtoInterface;
 
 /**
  *
  */
-class DtoIterator implements \Iterator
+class DtoIterator implements Iterator
 {
 
     private int $position = 0;

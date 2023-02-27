@@ -7,6 +7,7 @@ namespace Kaliop\IbexaContentDto\Services\Factory;
 use eZ\Publish\API\Repository\Values\Content\Content;
 use eZ\Publish\API\Repository\Values\Content\Field;
 use Kaliop\IbexaContentDto\Entity\DtoInterface;
+use ReflectionClass;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 
@@ -18,8 +19,7 @@ final class IbexaDtoFactory
 
     /**
      * @param DtoInterface $dto
-     * @param $content
-     * @param $location
+     * @param Content $content
      * @param string $currentLanguage
      *
      * @return DtoInterface
@@ -31,7 +31,7 @@ final class IbexaDtoFactory
     ): DtoInterface
     {
         $normalizer = new CamelCaseToSnakeCaseNameConverter();
-        $reflector = new \ReflectionClass($dto);
+        $reflector = new ReflectionClass($dto);
 
         // if mode than one translation, we force current language
         if(count($content->versionInfo->languageCodes) > 1) {

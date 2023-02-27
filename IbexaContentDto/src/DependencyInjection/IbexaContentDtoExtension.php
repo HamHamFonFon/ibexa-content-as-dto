@@ -2,6 +2,7 @@
 
 namespace Kaliop\IbexaContentDto\DependencyInjection;
 
+use Exception;
 use ReflectionClass;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -24,7 +25,7 @@ class IbexaContentDtoExtension extends Extension
      * @param ContainerBuilder $container
      *
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function load(array $configs, ContainerBuilder $container): void
     {

@@ -8,23 +8,13 @@ trait SymfonyServicesTrait
     protected RouterInterface $router;
     protected TranslatorInterface $translator;
 
-    /**
-     * @required
-     * @param RouterInterface $router
-     *
-     * @return void
-     */
+    #[Required]
     public function injectRouter(RouterInterface $router): void
     {
         $this->router = $this->router ?: $router;
     }
 
-    /**
-     * @required
-     * @param TranslatorInterface $translator
-     *
-     * @return void
-     */
+    #[Required]
     public function injectTranslator(TranslatorInterface $translator): void
     {
         $this->translator = $this->translator ?: $translator;

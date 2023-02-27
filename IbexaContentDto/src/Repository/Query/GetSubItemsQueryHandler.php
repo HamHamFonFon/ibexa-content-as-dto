@@ -11,6 +11,7 @@ use eZ\Publish\API\Repository\Values\Content\Query\Criterion\LogicalAnd;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion\LogicalNot;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion\ParentLocationId;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion\Visibility;
+use Generator;
 
 final class GetSubItemsQueryHandler
 {
@@ -25,7 +26,7 @@ final class GetSubItemsQueryHandler
      * @param array $languages
      * @param bool|null $visibility
      *
-     * @return \Generator
+     * @return Generator
      */
     public function __invoke(
         string $parentLocationId,
@@ -37,7 +38,7 @@ final class GetSubItemsQueryHandler
         ?array $excludedContentTypeIdentifiers,
         array $languages,
         ?bool $visibility
-    ): \Generator
+    ): Generator
     {
         $ibexaSortClause = new SortClause;
 
@@ -68,9 +69,7 @@ final class GetSubItemsQueryHandler
         $query->filter = new LogicalAnd($criterions);
         $query->limit = $limit;
         $query->offset = $offset;
-        $query->sortClauses = $sortClauses ?? $ibexaSortClause(
-            $parentLocationId
-        );
+        $query->sortClauses = $sortClauses ?? $ibexaSortClause($parentLocationId);
 
         return $query;
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kaliop\IbexaContentDto\Repository;
 
+use ErrorException;
 use Exception;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\Exceptions\UnauthorizedException;
@@ -19,6 +20,7 @@ use Kaliop\IbexaContentDto\Services\Traits\SymfonyServicesTrait;
 use ReflectionClass;
 use ReflectionException;
 use Kaliop\IbexaContentDto\Repository\ContentRepositoryInterface;
+use RuntimeException;
 
 
 /**
@@ -99,7 +101,7 @@ abstract class AbstractContentRepository
      * @param bool|null $isChild
      * @return DtoInterface|null
      * @throws ReflectionException
-     * @throws \ErrorException
+     * @throws ErrorException
      */
     protected function buildDtoFromLocation(Location $location, ?string $currentLanguage, ?bool $isChild = false): ?DtoInterface
     {
@@ -118,7 +120,7 @@ abstract class AbstractContentRepository
      *
      * @return DtoInterface|null
      * @throws ReflectionException
-     * @throws \ErrorException
+     * @throws ErrorException
      */
     protected function buildDtoFromContent(Content $content, ?string $currentLanguage, ?bool $isChild = false): ?DtoInterface
     {
@@ -126,7 +128,7 @@ abstract class AbstractContentRepository
             if (0 === error_reporting()) {
                 return false;
             }
-            throw new \ErrorException($errstr, 0, $severity, $errfile, $errline);
+            throw new ErrorException($errstr, 0, $severity, $errfile, $errline);
         });
 
         if (true === $isChild) {
@@ -204,7 +206,7 @@ abstract class AbstractContentRepository
                 if ($nestedDto instanceof DtoInterface) {
                     $collectionDto->addSubDto($nestedDto);
                 } else {
-                    throw new \RuntimeException('Error add nested DTO');
+                    throw new RuntimeException('Error add nested DTO');
                 }
             }
 
@@ -229,16 +231,15 @@ abstract class AbstractContentRepository
                  * @todo : move this condition into IbxRepositoryPass::class ?
                  */
                 if (!$childReflector->hasConstant('CONTENT_TYPE_ID')) {
-                    throw new \RuntimeException(sprintf('"%s" doesn\'t seem to have constant "%s" declared, please add it.', $childrenClass, 'CONTENT_TYPE_ID'));
+                    throw new RuntimeException(sprintf('"%s" doesn\'t seem to have constant "%s" declared, please add it.', $childrenClass, 'CONTENT_TYPE_ID'));
                 }
 
                 if ($contentTypeId === $childReflector->getConstant('CONTENT_TYPE_ID')) {
-                    $reflectionMethod = $childReflector->getMethod('getContentDTO');
-                    return $reflectionMethod->invoke(new $childrenClass($this->siteAccess));
+                    return $childReflector->getMethod('getContentDTO')->invoke(new $childrenClass($this->siteAccess));
                 }
             } else {
                 $msg = sprintf('"%s" doesn\'t seem to implement interface "%s", please add it.', $childrenClass, ContentRepositoryInterface::class);
-                throw new \RuntimeException($msg);
+                throw new RuntimeException($msg);
             }
         }
 
@@ -255,7 +256,7 @@ abstract class AbstractContentRepository
      * @param array|null $excludedContentTypeIdentifiers
      *
      * @return DtoCollection
-     * @throws ReflectionException|\ErrorException
+     * @throws ReflectionException|ErrorException
      */
     public function buildCollectionFromParent(Content $parentContent, ?array $contentTypeIdentifiers, ?array $sortClause, ?array $sectionsIds, ?int $offset, ?int $limit, ?array $excludedContentTypeIdentifiers): DtoCollection
     {

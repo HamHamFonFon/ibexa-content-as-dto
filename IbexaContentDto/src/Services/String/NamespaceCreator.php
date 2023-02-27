@@ -7,6 +7,7 @@ namespace Kaliop\IbexaContentDto\Services\String;
 use Exception;
 use Nadar\PhpComposerReader\AutoloadSection;
 use Nadar\PhpComposerReader\ComposerReader;
+use RuntimeException;
 
 /**
  *
@@ -24,12 +25,7 @@ final class NamespaceCreator
         return $this->kernelRootDir;
     }
 
-    /**
-     * @required
-     * @param mixed $kernelRootDir
-     *
-     * @return NamespaceCreator
-     */
+    #[Required]
     public function setKernelRootDir(string $kernelRootDir): NamespaceCreator
     {
         $this->kernelRootDir = $kernelRootDir;
@@ -47,7 +43,7 @@ final class NamespaceCreator
         // Read composer JSON
         $reader = new ComposerReader(sprintf('%s/../composer.json', $this->getKernelRootDir()));
         if (!$reader->canRead()) {
-            throw new \RuntimeException("composer.json file is not readable");
+            throw new RuntimeException("composer.json file is not readable");
         }
 
         // get type of autoload (psr-0 or psr-4)
