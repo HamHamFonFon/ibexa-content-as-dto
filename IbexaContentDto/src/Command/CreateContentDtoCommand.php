@@ -24,7 +24,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
  */
 class CreateContentDtoCommand extends Command
 {
-    protected static $defaultName = 'kaliop:dto:create';
+    protected static string $defaultName = 'kaliop:dto:create';
 
     private const SKELETON_DTO = 'IbexaContentDto/src/Resources/Files/SkeletonDto';
     private const SKELETON_REPO = 'IbexaContentDto/src/Resources/Files/SkeletonRepository';
@@ -163,7 +163,7 @@ class CreateContentDtoCommand extends Command
         $fullFilePath = sprintf('%s/../%s/%s', $this->kernelRootDir, $this->directoryDto, $fileName);
 
         // Get namespace
-        $nameSpace = $this->namespaceCreator->buildNamespace($filePath);
+        $nameSpace = $this->getNamespace($filePath);
 
         if (class_exists($nameSpace . '\\' . $className)) {
             $questionHelper = $this->getHelper('question');
@@ -242,7 +242,7 @@ class CreateContentDtoCommand extends Command
         $filePath = sprintf('%s/%s', $this->directoryRepository, $fileName);
         $fullFilePath = sprintf('%s/../%s/%s', $this->kernelRootDir, $this->directoryRepository, $fileName);
 
-        $nameSpace = $this->namespaceCreator->buildNamespace($filePath);
+        $nameSpace = $this->getNamespace($filePath);
 
         if (class_exists($nameSpace . '\\' . $className)) {
             $questionHelper = $this->getHelper('question');
@@ -291,9 +291,7 @@ class CreateContentDtoCommand extends Command
     {
         return preg_replace_callback('#%(.*?)%#', static function($match) use ($mapping) {
             $findKey = $match[1];
-            if (array_key_exists($findKey, $mapping)) {
-                return $mapping[$findKey];
-            }
+            return $mapping[$findKey] ?? null;
         }, file_get_contents(sprintf('%s/../%s', $this->kernelRootDir, $skeletonFile)));
     }
 
@@ -309,5 +307,10 @@ class CreateContentDtoCommand extends Command
 
         fwrite($handle, $content);
         fclose($handle);
+    }
+
+    private function getNamespace(string $filePath): string
+    {
+        return $this->namespaceCreator->buildNamespace($filePath);
     }
 }
