@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Kaliop\IbexaContentDto\Services\String;
 
-use Exception;
 use Nadar\PhpComposerReader\AutoloadSection;
 use Nadar\PhpComposerReader\ComposerReader;
 use RuntimeException;
