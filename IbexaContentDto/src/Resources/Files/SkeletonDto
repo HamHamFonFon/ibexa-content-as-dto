@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace %namespace%;
 
 use Kaliop\IbexaContentDto\Entity\DtoInterface;
@@ -9,10 +7,9 @@ use Kaliop\IbexaContentDto\Entity\Dto\AbstractDto;
 
 class %dtoClassName% extends AbstractDto implements DtoInterface
 {
-
-%listProperties%
-
+    public function __construct(
 %getters%
+    ) { }
 
     public function setName(string $name): ?DtoInterface
     {

@@ -189,27 +189,18 @@ class CreateContentDtoCommand extends Command
 
         // List fields and getters
         $listFields = $contentType->getFieldDefinitions();
-        $listProperties = $listGetters = '';
+        $listGetters = '';
 
         foreach ($listFields as $field) {
             $attribute = $camelCaseStringify($field->identifier);
             $type = IbexaDtoFactory::getType($field->fieldTypeIdentifier);
 
-            $listProperties .= sprintf('%sprotected %s $%s;%s',"\t", $type, lcfirst($attribute), PHP_EOL);
-
             $listGetters .= sprintf(
-                '%spublic function get%s(): ?%s%s%s{%s%sreturn $this->%s;%s%s}%s',
-                "\t",
-                $attribute,
-                $type,
-                PHP_EOL,
-                "\t",
-                PHP_EOL,
+                '%spublic readonly %s $%s %s',
                 "\t\t",
+                $type,
                 lcfirst($attribute),
                 PHP_EOL,
-                "\t",
-                PHP_EOL . PHP_EOL
             );
         }
 
@@ -220,7 +211,6 @@ class CreateContentDtoCommand extends Command
         $mapping = [
             'namespace' => $nameSpace,
             'dtoClassName' => $className,
-            'listProperties' => $listProperties,
             'getters' => $listGetters,
             'listObjectRelationList' => (0 < count($getListRelationFields)) ? sprintf('[%s]', implode(',', $getListRelationFields)) : 'null'
         ];
