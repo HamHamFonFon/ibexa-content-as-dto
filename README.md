@@ -15,7 +15,7 @@ because it will contain only fields value (in current language for multiple lang
 
 Requirements
 ----------------------------------------
- - PHP 8.0 or later
+ - PHP 8.1 or later
  - Ibexa 4.0 (Ibexa DXP) / Symfony 5.*
 
 Installation

@@ -28,13 +28,6 @@ class CreateContentDtoCommand extends Command
     private const SKELETON_DTO = 'IbexaContentDto/src/Resources/Files/SkeletonDto';
     private const SKELETON_REPO = 'IbexaContentDto/src/Resources/Files/SkeletonRepository';
 
-    private Repository $repository;
-    private NamespaceCreator $namespaceCreator;
-    private string $kernelRootDir;
-    private string $directoryRepository;
-    private string $directoryDto;
-    private array $contentTypeGroups;
-
     use IbexaServicesTrait;
 
     /**
@@ -57,20 +50,14 @@ class CreateContentDtoCommand extends Command
      * @param array $contentTypeGroups
      */
     public function __construct(
-        Repository $repository,
-        NamespaceCreator $namespaceCreator,
-        string $kernelRootDir,
-        string $directoryRepository,
-        string $directoryDto,
-        array $contentTypeGroups
+        private readonly Repository       $repository,
+        private readonly NamespaceCreator $namespaceCreator,
+        private readonly string           $kernelRootDir,
+        private readonly string           $directoryRepository,
+        private readonly string           $directoryDto,
+        private readonly array $contentTypeGroups
     )
     {
-        $this->repository = $repository;
-        $this->namespaceCreator = $namespaceCreator;
-        $this->kernelRootDir = $kernelRootDir;
-        $this->directoryRepository = $directoryRepository;
-        $this->directoryDto = $directoryDto;
-        $this->contentTypeGroups = $contentTypeGroups;
         parent::__construct();
     }
 

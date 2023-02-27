@@ -28,10 +28,6 @@ abstract class AbstractContentRepository
 {
     use IbexaServicesTrait, SymfonyServicesTrait;
 
-    private SiteAccess $siteAccess;
-
-    private IbexaProperties $ibexaProperties;
-
     protected array $listRepositories;
 
     public const OFFSET = 0;
@@ -41,11 +37,11 @@ abstract class AbstractContentRepository
      * @param SiteAccess $siteAccess
      * @param IbexaProperties $ibexaProperties
      */
-    public function __construct(SiteAccess $siteAccess, IbexaProperties $ibexaProperties)
-    {
-        $this->siteAccess = $siteAccess;
-        $this->ibexaProperties = $ibexaProperties;
-    }
+    public function __construct(
+        private readonly SiteAccess      $siteAccess,
+        private readonly IbexaProperties $ibexaProperties
+    )
+    { }
 
     abstract public function getContentTypeId(): string;
     abstract public function getContentDTO(): ?string;
@@ -196,6 +192,7 @@ abstract class AbstractContentRepository
                 continue;
             }
             foreach ($values as $destinationContentId) {
+                $nestedDto = null;
                 try {
                     $content = $this->contentService->loadContent($destinationContentId);
                     if (!$content instanceof Content) {
@@ -209,7 +206,6 @@ abstract class AbstractContentRepository
                 } else {
                     throw new \RuntimeException('Error add nested DTO');
                 }
-
             }
 
             $property->setValue($parentDto, $collectionDto);

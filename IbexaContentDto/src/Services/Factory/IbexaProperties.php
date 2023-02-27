@@ -4,15 +4,12 @@ namespace Kaliop\IbexaContentDto\Services\Factory;
 
 use Kaliop\IbexaContentDto\Entity\DtoInterface;
 
+
 final class IbexaProperties
 {
-
-    private RouterInterface $router;
-
-    public function __construct(RouterInterface $router)
-    {
-        $this->router = $router;
-    }
+    public function __construct(
+        private readonly RouterInterface $router
+    ) { }
 
     public function attachContent(DtoInterface $dto, Content $content, ?string $currentLanguage): DtoInterface
     {

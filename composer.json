@@ -1,7 +1,7 @@
 {
   "name": "kaliop/ibexa-content-dto",
   "licence": "MIT",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Transform content value object into DTO",
   "keywords": ["ibexa", "content", "dto"],
   "type": "symfony-bundle",
@@ -10,7 +10,7 @@
     "email" : "smeaudre@kaliop.com"
   }],
   "require": {
-    "php": "^8.0",
+    "php": "^8.1",
     "ext-json": "*",
     "ext-intl": "*",
     "nadar/php-composer-reader": "^1.3",

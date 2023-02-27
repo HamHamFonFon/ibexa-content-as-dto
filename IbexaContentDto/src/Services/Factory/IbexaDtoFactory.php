@@ -26,8 +26,8 @@ final class IbexaDtoFactory
      */
     public static function hydrateDto(
         DtoInterface $dto,
-                     $content,
-        string       $currentLanguage
+        Content $content,
+        string $currentLanguage
     ): DtoInterface
     {
         $normalizer = new CamelCaseToSnakeCaseNameConverter();
@@ -53,52 +53,32 @@ final class IbexaDtoFactory
     }
 
     /**
+     * @param Content $content
+     * @param Field $field
      * @return mixed
      */
     private static function getValue(Content $content, Field $field): mixed
     {
-        switch ($field->fieldTypeIdentifier) {
-            case 'ezstring':
-            case 'eztext':
-                $value = $field->value->text;
-                break;
-            case 'ezinteger':
-                $value = $field->value->value;
-                break;
-            case 'ezboolean':
-                $value = $field->value->bool;
-                break;
-            case 'ezrichtext':
-                $value = $field->value->xml;
-                break;
-            case 'ezselection':
+        return match ($field->fieldTypeIdentifier) {
+            'ezstring', 'eztext' => $field->value->text,
+            'ezinteger' => $field->value->value,
+            'ezboolean' => $field->value->bool,
+            'ezrichtext' => $field->value->xml,
+            'ezobjectrelationlist' => $field->value->destinationContentIds,
+            'ezselection' => static function() use($content, $field) {
                 $fieldSettings = $content->getContentType()
                     ->getFieldDefinition($field->fieldDefIdentifier)
                     ->getFieldSettings();
                 $selection = (0 < count($field->value->selection)) ? $field->value->selection[0] : null;
-                $value = (!is_null($selection)) ? $fieldSettings['options'][$selection] : null;
-                break;
-            case 'ezobjectrelationlist':
-                $value = $field->value->destinationContentIds;
-                break;
-            case 'ezdate':
-                $value = $field->value->date;
-                break;
-            case 'eztime':
-                // @todo check value
-                $value = $field->value->time;
-                break;
-            case 'ezimage':
-                $value = (!is_null($field->value->id)) ? $field->value : null;
-                break;
-            case 'ezbinaryfile':
-                //$value = $this->router->generate('ez_content_download')$field->value;
-            case 'ezurl':
-            default:
-                return $field->value;
-        }
+                return (!is_null($selection)) ? $fieldSettings['options'][$selection] : null;
+            },
+            'ezdate' => $field->value->date,
+            'eztime' => $field->value->time,
+            'ezimage' => (!is_null($field->value->id)) ? $field->value : null,
+            default => $field->value
+        };
 
-        return $value;
+
     }
 
     /**
