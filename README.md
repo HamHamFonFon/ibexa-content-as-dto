@@ -21,23 +21,11 @@ Requirements
 Installation
 ----------------------------------------
 
-### Step 1: Download the Bundle
+### Step 1: Install Bundle
 
-Add vcs repository to your composer.json :
-``` 
-"repositories": {
-    ...
-     "kaliop/ibexa-content-dto": {
-         "type": "vcs",
-         "url": "ssh://git@git.kaliop.net:7999/customers/kaliop/reuse/ibexa/ibexa-content-dto.git"
-     }
-},
-```
-Open a command console, enter your project directory and execute the 
-following command to download the latest stable version of this bundle:
 
 ```console
-$ composer require kaliop/ibexa-content-dto
+$ composer require HamHamFonFon/ibexa-content-dto
 ```
 
 ### Step 2: Enable the Bundle
@@ -49,7 +37,7 @@ in the `config/bundles.php` file of your project:
 // config/bundles.php
 return [
     // ...
-    Kaliop\IbexaContentDto\IbexaContentDtoBundle::class => ['all' => true],
+    HamHamFonFon\IbexaContentDto\IbexaContentDtoBundle::class => ['all' => true],
 ];
 ```
 
@@ -87,8 +75,8 @@ Example, you have a content-type `article` with fields `title` (ezstring), `titl
 Your DTO will be like this :
 ```php 
 
-use Kaliop\IbexaContentDto\Entity\DtoInterface;
-use Kaliop\IbexaContentDto\Entity\Dto\AbstractDto;
+use HamHamFonFon\IbexaContentDto\Entity\DtoInterface;
+use HamHamFonFon\IbexaContentDto\Entity\Dto\AbstractDto;
 
 class Article extends AbstractDto implements DtoInterface
 {
@@ -112,7 +100,7 @@ class Article extends AbstractDto implements DtoInterface
 You can add your own methods in the DTO if you have specific needs.
 
 #### Automatically
-Just use symfony command `php bin/console kaliop:dto:create`, both classes will be generated.
+Just use symfony command `php bin/console dto:create`, both classes will be generated.
 
 ### Step 2: Complete DTO
 ### Step 3: Get an ibexa content into DTO
@@ -132,4 +120,4 @@ In case you find some bugs or have question about this repository, open an issue
 
 Authors
 ----------------------------------------
-Stéphane MEAUDRE <smeaudre@kaliop.com>
+Stéphane MEAUDRE <balistik.fonfon@gmail.com>
